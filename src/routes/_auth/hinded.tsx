@@ -66,6 +66,9 @@ function RouteComponent() {
     entries.push(score)
   })
 
+  const summedScores: number[] = []
+  for (let i = 1; i <= 10; ++i) summedScores.push(0)
+
   // Keep only a single score per tent per calendar day.
   // Average multiple values for the same day.
   const uniqueDateScores = new Map<string, DisplayTentScore[]>()
@@ -86,17 +89,31 @@ function RouteComponent() {
         }
       })
 
+      const dailyScore = totalScore / totalCount
+
       if (totalCount > 0) {
         dateScores.push({
-          score: totalScore / totalCount,
+          score: dailyScore,
           tentNr: i,
           createdAt: dateString,
         })
       }
+
+      if (!isNaN(dailyScore)) summedScores[i - 1] += dailyScore
     }
 
     uniqueDateScores.set(dateString, dateScores)
   })
+
+  const averages: DisplayTentScore[] = []
+  for (let i = 0; i < 10; ++i) {
+    averages.push({
+      score: summedScores[i] / uniqueDateScores.size,
+      tentNr: i + 1,
+      createdAt: 'Keskmine',
+    })
+  }
+  uniqueDateScores.set('Keskmine', averages)
 
   return (
     <div className="px-6 pb-6 flex flex-col gap-6 overflow-y-scroll h-[calc((100%-var(--spacing)*16))]">
