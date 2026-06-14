@@ -11,7 +11,9 @@ import {
   ChevronsUpDownIcon,
   ChevronUpIcon,
   MailCheckIcon,
+  MarsIcon,
   NotebookText,
+  VenusIcon,
 } from 'lucide-react'
 import { toast } from 'sonner'
 
@@ -43,7 +45,6 @@ import {
   type ColumnDef,
   getCoreRowModel,
   getSortedRowModel,
-  type Row,
   type RowData,
   type SortingState,
   type VisibilityState,
@@ -70,13 +71,8 @@ export const Route = createFileRoute('/_auth/nimekiri/$shiftNr')({
   },
 })
 
-type RegistrationGroup = {
-  header: string
-  rows: RegistrationEntry[]
-}
-
 type RegistrationDataTableProps = {
-  groups: RegistrationGroup[]
+  registrations: RegistrationEntry[]
   isDetailView: boolean
   isPriceEditable: boolean
 }
@@ -114,8 +110,7 @@ const registrationColumns: ColumnDef<RegistrationEntry>[] = [
       const { isDetailView } = table.options.meta!
       const isFinanceAvailable = registration.pricePaid !== undefined
       const isPaid = registration.pricePaid === registration.priceToPay
-      // The finance badge is only a hint in the simple view; the detail
-      // view exposes the underlying price columns instead.
+
       const displayFinanceBadge = !isDetailView && isFinanceAvailable && isPaid
 
       return (
@@ -225,6 +220,17 @@ const registrationColumns: ColumnDef<RegistrationEntry>[] = [
     ),
   },
   {
+    id: 'sex',
+    accessorKey: 'child.sex',
+    header: 'Sugu',
+    cell: ({ row }) =>
+      row.original.child.sex === Sex.M ? (
+        <MarsIcon className="size-4" />
+      ) : (
+        <VenusIcon className="size-4" />
+      ),
+  },
+  {
     id: 'isOld',
     accessorKey: 'isOld',
     header: 'Vana?',
@@ -239,14 +245,13 @@ const registrationColumns: ColumnDef<RegistrationEntry>[] = [
 ]
 
 export const RegistrationDataTable = ({
-  groups,
+  registrations,
   isDetailView,
   isPriceEditable,
 }: RegistrationDataTableProps) => {
   const queryClient = useQueryClient()
 
-  const data = groups.flatMap((group) => group.rows)
-  const shiftNr = data[0]?.shiftNr
+  const shiftNr = registrations[0]?.shiftNr
 
   const mutation = useMutation({
     mutationFn: (newState: RegistrationMutation) =>
@@ -300,9 +305,7 @@ export const RegistrationDataTable = ({
     })
   }
 
-  // The detail view reveals the registration toggle and (when available) the
-  // finance columns; the contact columns only exist when the data has them.
-  const sample = data[0]
+  const sample = registrations[0]
   const isFinanceAvailable = sample?.pricePaid !== undefined
   const hasContact = !!sample?.contactName
 
@@ -318,7 +321,7 @@ export const RegistrationDataTable = ({
   const [sorting, setSorting] = React.useState<SortingState>([])
 
   const table = useReactTable({
-    data,
+    data: registrations,
     columns: registrationColumns,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
@@ -332,24 +335,6 @@ export const RegistrationDataTable = ({
       toggleRegistration,
     },
   })
-
-  const visibleColumnCount = table.getVisibleLeafColumns().length
-
-  // Sorting reorders the global row model; we re-bucket the already-sorted rows
-  // back into the four sections so the grouping is preserved while each section
-  // is sorted internally.
-  const sectionRows: { header: string; rows: Row<RegistrationEntry>[] }[] =
-    groups.map((group) => ({ header: group.header, rows: [] }))
-  const sectionIndexById = new Map<string, number>()
-  groups.forEach((group, index) =>
-    group.rows.forEach((registration) =>
-      sectionIndexById.set(String(registration.id), index),
-    ),
-  )
-  for (const row of table.getRowModel().rows) {
-    const index = sectionIndexById.get(row.id)
-    if (index !== undefined) sectionRows[index].rows.push(row)
-  }
 
   return (
     <div className="mx-6 rounded-md border">
@@ -393,29 +378,14 @@ export const RegistrationDataTable = ({
           ))}
         </TableHeader>
         <TableBody>
-          {sectionRows.map((section) => (
-            <React.Fragment key={section.header}>
-              <TableRow className="bg-muted/60 hover:bg-muted/60">
-                <TableCell
-                  colSpan={visibleColumnCount}
-                  className="font-medium"
-                >
-                  {section.header}
+          {table.getRowModel().rows.map((row) => (
+            <TableRow key={row.id}>
+              {row.getVisibleCells().map((cell) => (
+                <TableCell key={cell.id}>
+                  {flexRender(cell.column.columnDef.cell, cell.getContext())}
                 </TableCell>
-              </TableRow>
-              {section.rows.map((row) => (
-                <TableRow key={row.id}>
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext(),
-                      )}
-                    </TableCell>
-                  ))}
-                </TableRow>
               ))}
-            </React.Fragment>
+            </TableRow>
           ))}
         </TableBody>
       </Table>
@@ -431,43 +401,39 @@ function RouteComponent() {
     registrationsQueryOptions(shiftNr),
   )
 
-  const regCategories: {
-    [key: string]: { [key in Sex]: RegistrationEntry[] }
-  } = {
-    reg: { M: [], F: [] },
-    res: { M: [], F: [] },
-  }
+  const { regCategories, registeredCampers, reserveCampers } =
+    React.useMemo(() => {
+      const categories: {
+        [key: string]: { [key in Sex]: RegistrationEntry[] }
+      } = {
+        reg: { M: [], F: [] },
+        res: { M: [], F: [] },
+      }
 
-  registrations.forEach((registration) => {
-    if (registration.isRegistered) {
-      if (registration.child.sex === Sex.M)
-        regCategories.reg.M.push(registration)
-      else regCategories.reg.F.push(registration)
-    } else {
-      if (registration.child.sex === Sex.M)
-        regCategories.res.M.push(registration)
-      else regCategories.res.F.push(registration)
-    }
-  })
+      registrations.forEach((registration) => {
+        const bucket = registration.isRegistered
+          ? categories.reg
+          : categories.res
+        if (registration.child.sex === Sex.M) bucket.M.push(registration)
+        else bucket.F.push(registration)
+      })
 
-  const groups: RegistrationGroup[] = [
-    { header: 'Poisid', rows: regCategories.reg.M },
-    { header: 'Tüdrukud', rows: regCategories.reg.F },
-    { header: 'Reserv Poisid', rows: regCategories.res.M },
-    { header: 'Reserv Tüdrukud', rows: regCategories.res.F },
-  ]
+      return {
+        regCategories: categories,
+        registeredCampers: [...categories.reg.M, ...categories.reg.F],
+        reserveCampers: [...categories.res.M, ...categories.res.F],
+      }
+    }, [registrations])
 
   const [isDetailView, setDetailView] = React.useState(false)
   const [isPriceEditable, setPriceEditable] = React.useState(false)
 
   const setDetailVisibility = (isDetailed: boolean) => {
-    // Prices cannot be edited in the simple view.
     if (isPriceEditable) setPriceEditable(isDetailed)
     setDetailView(isDetailed)
   }
 
   const setPriceEditingView = (isEditable: boolean) => {
-    // Price editing requires the detailed view.
     if (!isDetailView) setDetailView(isEditable)
     setPriceEditable(isEditable)
   }
@@ -525,8 +491,15 @@ function RouteComponent() {
         resMCount={regCategories.res.M.length}
         resFCount={regCategories.res.F.length}
       />
+      <h2 className="px-6 pt-4 pb-2 font-semibold">Nimekirjas</h2>
       <RegistrationDataTable
-        groups={groups}
+        registrations={registeredCampers}
+        isDetailView={isDetailView}
+        isPriceEditable={isPriceEditable}
+      />
+      <h2 className="px-6 pt-6 pb-2 font-semibold">Reservis</h2>
+      <RegistrationDataTable
+        registrations={reserveCampers}
         isDetailView={isDetailView}
         isPriceEditable={isPriceEditable}
       />
