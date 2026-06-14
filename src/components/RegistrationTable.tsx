@@ -191,8 +191,6 @@ const TableDataRow = ({
   const displayFinanceBadge = !isDetailView && isFinanceAvailable
   const isPaid = registration.pricePaid === registration.priceToPay
 
-  console.log(registration.addendum)
-
   return (
     <tr className={classList}>
       <TableCell isFirst={true}>
