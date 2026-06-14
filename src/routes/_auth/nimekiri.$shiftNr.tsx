@@ -10,6 +10,7 @@ import {
   ChevronDownIcon,
   ChevronsUpDownIcon,
   ChevronUpIcon,
+  ListFilterIcon,
   MailCheckIcon,
   MarsIcon,
   NotebookText,
@@ -42,14 +43,24 @@ import { ChildCounter } from '@/components/ChildCounter.tsx'
 import { ShiftNav } from '@/components/ShiftMenu.tsx'
 
 import {
+  type Column,
   type ColumnDef,
+  type ColumnFiltersState,
   getCoreRowModel,
+  getFilteredRowModel,
   getSortedRowModel,
   type RowData,
   type SortingState,
   type VisibilityState,
 } from '@tanstack/table-core'
 import { flexRender, useReactTable } from '@tanstack/react-table'
+
+import {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu.tsx'
 
 import {
   fetchShiftPdf,
@@ -98,6 +109,59 @@ declare module '@tanstack/table-core' {
     ) => void
     toggleRegistration: (registration: RegistrationEntry) => void
   }
+}
+
+// Faceted filter for the sex column: both sexes selected is represented as no
+// active filter; unchecking narrows it to one sex, and unchecking both shows
+// none.
+const SexFilterHeader = ({
+  column,
+}: {
+  column: Column<RegistrationEntry, unknown>
+}) => {
+  const selected = column.getFilterValue() as Sex[] | undefined
+
+  const isChecked = (sex: Sex) =>
+    selected === undefined ? true : selected.includes(sex)
+
+  const toggle = (sex: Sex, checked: boolean) => {
+    const current = selected ?? [Sex.M, Sex.F]
+    const next = checked
+      ? Array.from(new Set([...current, sex]))
+      : current.filter((s) => s !== sex)
+    column.setFilterValue(next.length === 2 ? undefined : next)
+  }
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <button type="button" className="flex items-center gap-1 select-none">
+          Sugu
+          <ListFilterIcon
+            className={`size-4 ${selected === undefined ? 'opacity-50' : ''}`}
+          />
+        </button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="start">
+        <DropdownMenuCheckboxItem
+          checked={isChecked(Sex.M)}
+          onCheckedChange={(checked) => toggle(Sex.M, checked)}
+          onSelect={(e) => e.preventDefault()}
+        >
+          <MarsIcon className="size-4" />
+          Poisid
+        </DropdownMenuCheckboxItem>
+        <DropdownMenuCheckboxItem
+          checked={isChecked(Sex.F)}
+          onCheckedChange={(checked) => toggle(Sex.F, checked)}
+          onSelect={(e) => e.preventDefault()}
+        >
+          <VenusIcon className="size-4" />
+          Tüdrukud
+        </DropdownMenuCheckboxItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  )
 }
 
 const registrationColumns: ColumnDef<RegistrationEntry>[] = [
@@ -222,7 +286,10 @@ const registrationColumns: ColumnDef<RegistrationEntry>[] = [
   {
     id: 'sex',
     accessorKey: 'child.sex',
-    header: 'Sugu',
+    header: ({ column }) => <SexFilterHeader column={column} />,
+    enableSorting: false,
+    filterFn: (row, columnId, filterValue: Sex[]) =>
+      filterValue.includes(row.getValue(columnId)),
     cell: ({ row }) =>
       row.original.child.sex === Sex.M ? (
         <MarsIcon className="size-4" />
@@ -319,15 +386,20 @@ export const RegistrationDataTable = ({
   }
 
   const [sorting, setSorting] = React.useState<SortingState>([])
+  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
+    [],
+  )
 
   const table = useReactTable({
     data: registrations,
     columns: registrationColumns,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
     onSortingChange: setSorting,
+    onColumnFiltersChange: setColumnFilters,
     getRowId: (row) => String(row.id),
-    state: { columnVisibility, sorting },
+    state: { columnVisibility, sorting, columnFilters },
     meta: {
       isDetailView,
       isPriceEditable,
@@ -366,10 +438,12 @@ export const RegistrationDataTable = ({
                         )}
                       </button>
                     ) : (
-                      flexRender(
-                        header.column.columnDef.header,
-                        header.getContext(),
-                      )
+                      <span className="flex items-center gap-1">
+                        {flexRender(
+                          header.column.columnDef.header,
+                          header.getContext(),
+                        )}
+                      </span>
                     )}
                   </TableHead>
                 )
