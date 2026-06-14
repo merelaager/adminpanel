@@ -108,6 +108,7 @@ const TeamCardEntry = ({ member }: TeamCardEntryProps) => {
     boss: 'Juhataja',
     full: 'Kasvataja',
     part: 'Abikasvataja',
+    guest: 'Suvitaja',
   }
   const displayRole = roles[member.role]
 
