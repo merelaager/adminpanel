@@ -83,9 +83,11 @@ export const Route = createFileRoute('/_auth/nimekiri/$shiftNr')({
 })
 
 type RegistrationDataTableProps = {
+  title: string
   registrations: RegistrationEntry[]
   isDetailView: boolean
   isPriceEditable: boolean
+  showSearch?: boolean
 }
 
 type RegistrationMutation = {
@@ -111,9 +113,6 @@ declare module '@tanstack/table-core' {
   }
 }
 
-// Faceted filter for the sex column: both sexes selected is represented as no
-// active filter; unchecking narrows it to one sex, and unchecking both shows
-// none.
 const SexFilterHeader = ({
   column,
 }: {
@@ -312,9 +311,11 @@ const registrationColumns: ColumnDef<RegistrationEntry>[] = [
 ]
 
 export const RegistrationDataTable = ({
+  title,
   registrations,
   isDetailView,
   isPriceEditable,
+  showSearch = false,
 }: RegistrationDataTableProps) => {
   const queryClient = useQueryClient()
 
@@ -389,6 +390,7 @@ export const RegistrationDataTable = ({
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     [],
   )
+  const [globalFilter, setGlobalFilter] = React.useState('')
 
   const table = useReactTable({
     data: registrations,
@@ -398,8 +400,16 @@ export const RegistrationDataTable = ({
     getFilteredRowModel: getFilteredRowModel(),
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
+    onGlobalFilterChange: setGlobalFilter,
+    globalFilterFn: (row, _columnId, value) => {
+      const needle = String(value).toLowerCase()
+      const { child, contactName, contactEmail } = row.original
+      return [child.name, contactName, contactEmail].some((field) =>
+        field?.toLowerCase().includes(needle),
+      )
+    },
     getRowId: (row) => String(row.id),
-    state: { columnVisibility, sorting, columnFilters },
+    state: { columnVisibility, sorting, columnFilters, globalFilter },
     meta: {
       isDetailView,
       isPriceEditable,
@@ -409,60 +419,73 @@ export const RegistrationDataTable = ({
   })
 
   return (
-    <div className="mx-6 rounded-md border">
-      <Table>
-        <TableHeader>
-          {table.getHeaderGroups().map((headerGroup) => (
-            <TableRow key={headerGroup.id}>
-              {headerGroup.headers.map((header) => {
-                const canSort = header.column.getCanSort()
-                const sortDirection = header.column.getIsSorted()
-                return (
-                  <TableHead key={header.id}>
-                    {header.isPlaceholder ? null : canSort ? (
-                      <button
-                        type="button"
-                        className="flex items-center gap-1 select-none"
-                        onClick={header.column.getToggleSortingHandler()}
-                      >
-                        {flexRender(
-                          header.column.columnDef.header,
-                          header.getContext(),
-                        )}
-                        {sortDirection === 'asc' ? (
-                          <ChevronUpIcon className="size-4" />
-                        ) : sortDirection === 'desc' ? (
-                          <ChevronDownIcon className="size-4" />
-                        ) : (
-                          <ChevronsUpDownIcon className="size-4 opacity-50" />
-                        )}
-                      </button>
-                    ) : (
-                      <span className="flex items-center gap-1">
-                        {flexRender(
-                          header.column.columnDef.header,
-                          header.getContext(),
-                        )}
-                      </span>
-                    )}
-                  </TableHead>
-                )
-              })}
-            </TableRow>
-          ))}
-        </TableHeader>
-        <TableBody>
-          {table.getRowModel().rows.map((row) => (
-            <TableRow key={row.id}>
-              {row.getVisibleCells().map((cell) => (
-                <TableCell key={cell.id}>
-                  {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                </TableCell>
-              ))}
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+    <div>
+      <div className="px-6 pt-4 pb-2 flex items-center gap-4">
+        <h2 className="font-semibold">{title}</h2>
+        {showSearch && (
+          <Input
+            className="max-w-xs"
+            placeholder="Otsi..."
+            value={globalFilter}
+            onChange={(e) => setGlobalFilter(e.target.value)}
+          />
+        )}
+      </div>
+      <div className="mx-6 rounded-md border">
+        <Table>
+          <TableHeader>
+            {table.getHeaderGroups().map((headerGroup) => (
+              <TableRow key={headerGroup.id}>
+                {headerGroup.headers.map((header) => {
+                  const canSort = header.column.getCanSort()
+                  const sortDirection = header.column.getIsSorted()
+                  return (
+                    <TableHead key={header.id}>
+                      {header.isPlaceholder ? null : canSort ? (
+                        <button
+                          type="button"
+                          className="flex items-center gap-1 select-none"
+                          onClick={header.column.getToggleSortingHandler()}
+                        >
+                          {flexRender(
+                            header.column.columnDef.header,
+                            header.getContext(),
+                          )}
+                          {sortDirection === 'asc' ? (
+                            <ChevronUpIcon className="size-4" />
+                          ) : sortDirection === 'desc' ? (
+                            <ChevronDownIcon className="size-4" />
+                          ) : (
+                            <ChevronsUpDownIcon className="size-4 opacity-50" />
+                          )}
+                        </button>
+                      ) : (
+                        <span className="flex items-center gap-1">
+                          {flexRender(
+                            header.column.columnDef.header,
+                            header.getContext(),
+                          )}
+                        </span>
+                      )}
+                    </TableHead>
+                  )
+                })}
+              </TableRow>
+            ))}
+          </TableHeader>
+          <TableBody>
+            {table.getRowModel().rows.map((row) => (
+              <TableRow key={row.id}>
+                {row.getVisibleCells().map((cell) => (
+                  <TableCell key={cell.id}>
+                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                  </TableCell>
+                ))}
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
     </div>
   )
 }
@@ -565,14 +588,15 @@ function RouteComponent() {
         resMCount={regCategories.res.M.length}
         resFCount={regCategories.res.F.length}
       />
-      <h2 className="px-6 pt-4 pb-2 font-semibold">Nimekirjas</h2>
       <RegistrationDataTable
+        title="Põhinimekiri"
         registrations={registeredCampers}
         isDetailView={isDetailView}
         isPriceEditable={isPriceEditable}
+        showSearch
       />
-      <h2 className="px-6 pt-6 pb-2 font-semibold">Reservis</h2>
       <RegistrationDataTable
+        title="Reserv"
         registrations={reserveCampers}
         isDetailView={isDetailView}
         isPriceEditable={isPriceEditable}
