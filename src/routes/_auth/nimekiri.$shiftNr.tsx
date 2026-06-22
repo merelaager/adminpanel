@@ -40,6 +40,7 @@ import {
 } from '@/components/ui/table.tsx'
 
 import { ChildCounter } from '@/components/ChildCounter.tsx'
+import { ChildRecordsSheet } from '@/components/ChildRecordsSheet.tsx'
 import { ShiftNav } from '@/components/ShiftMenu.tsx'
 
 import {
@@ -178,7 +179,10 @@ const registrationColumns: ColumnDef<RegistrationEntry>[] = [
 
       return (
         <div className="flex justify-between gap-4">
-          {registration.child.name}
+          <ChildRecordsSheet
+            childId={registration.childId}
+            childName={registration.child.name}
+          />
           <div className="flex gap-2">
             {registration.addendum ? (
               <Tooltip>
