@@ -1,0 +1,4 @@
+# iOS Universal Links: serve the extensionless AASA file as application/json.
+<Files "apple-app-site-association">
+  ForceType application/json
+</Files>

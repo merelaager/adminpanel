@@ -1,0 +1,15 @@
+{
+  "applinks": {
+    "details": [
+      {
+        "appIDs": ["FA4CPCHYTS.ee.merelaager.sild"],
+        "components": [
+          {
+            "/": "/telgid/*",
+            "comment": "Matches /telgid/<id> and opens them in the app"
+          }
+        ]
+      }
+    ]
+  }
+}
