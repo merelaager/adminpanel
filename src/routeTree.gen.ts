@@ -12,8 +12,10 @@
 
 import { Route as rootRoute } from './routes/__root'
 import { Route as SignupImport } from './routes/signup'
+import { Route as PrivaatsustingimusedImport } from './routes/privaatsustingimused'
 import { Route as PasswordResetImport } from './routes/password-reset'
 import { Route as LoginImport } from './routes/login'
+import { Route as KontaktImport } from './routes/kontakt'
 import { Route as AuthRouteImport } from './routes/_auth/route'
 import { Route as AuthIndexImport } from './routes/_auth/index'
 import { Route as AuthTaimerImport } from './routes/_auth/taimer'
@@ -36,6 +38,12 @@ const SignupRoute = SignupImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
+const PrivaatsustingimusedRoute = PrivaatsustingimusedImport.update({
+  id: '/privaatsustingimused',
+  path: '/privaatsustingimused',
+  getParentRoute: () => rootRoute,
+} as any)
+
 const PasswordResetRoute = PasswordResetImport.update({
   id: '/password-reset',
   path: '/password-reset',
@@ -45,6 +53,12 @@ const PasswordResetRoute = PasswordResetImport.update({
 const LoginRoute = LoginImport.update({
   id: '/login',
   path: '/login',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const KontaktRoute = KontaktImport.update({
+  id: '/kontakt',
+  path: '/kontakt',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -136,6 +150,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRoute
     }
+    '/kontakt': {
+      id: '/kontakt'
+      path: '/kontakt'
+      fullPath: '/kontakt'
+      preLoaderRoute: typeof KontaktImport
+      parentRoute: typeof rootRoute
+    }
     '/login': {
       id: '/login'
       path: '/login'
@@ -148,6 +169,13 @@ declare module '@tanstack/react-router' {
       path: '/password-reset'
       fullPath: '/password-reset'
       preLoaderRoute: typeof PasswordResetImport
+      parentRoute: typeof rootRoute
+    }
+    '/privaatsustingimused': {
+      id: '/privaatsustingimused'
+      path: '/privaatsustingimused'
+      fullPath: '/privaatsustingimused'
+      preLoaderRoute: typeof PrivaatsustingimusedImport
       parentRoute: typeof rootRoute
     }
     '/signup': {
@@ -292,8 +320,10 @@ const AuthRouteRouteWithChildren = AuthRouteRoute._addFileChildren(
 
 export interface FileRoutesByFullPath {
   '': typeof AuthRouteRouteWithChildren
+  '/kontakt': typeof KontaktRoute
   '/login': typeof LoginRoute
   '/password-reset': typeof PasswordResetRoute
+  '/privaatsustingimused': typeof PrivaatsustingimusedRoute
   '/signup': typeof SignupRoute
   '/arved': typeof AuthArvedRoute
   '/hinded': typeof AuthHindedRoute
@@ -310,8 +340,10 @@ export interface FileRoutesByFullPath {
 }
 
 export interface FileRoutesByTo {
+  '/kontakt': typeof KontaktRoute
   '/login': typeof LoginRoute
   '/password-reset': typeof PasswordResetRoute
+  '/privaatsustingimused': typeof PrivaatsustingimusedRoute
   '/signup': typeof SignupRoute
   '/arved': typeof AuthArvedRoute
   '/hinded': typeof AuthHindedRoute
@@ -330,8 +362,10 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/_auth': typeof AuthRouteRouteWithChildren
+  '/kontakt': typeof KontaktRoute
   '/login': typeof LoginRoute
   '/password-reset': typeof PasswordResetRoute
+  '/privaatsustingimused': typeof PrivaatsustingimusedRoute
   '/signup': typeof SignupRoute
   '/_auth/arved': typeof AuthArvedRoute
   '/_auth/hinded': typeof AuthHindedRoute
@@ -351,8 +385,10 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | ''
+    | '/kontakt'
     | '/login'
     | '/password-reset'
+    | '/privaatsustingimused'
     | '/signup'
     | '/arved'
     | '/hinded'
@@ -368,8 +404,10 @@ export interface FileRouteTypes {
     | '/telgid'
   fileRoutesByTo: FileRoutesByTo
   to:
+    | '/kontakt'
     | '/login'
     | '/password-reset'
+    | '/privaatsustingimused'
     | '/signup'
     | '/arved'
     | '/hinded'
@@ -386,8 +424,10 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/_auth'
+    | '/kontakt'
     | '/login'
     | '/password-reset'
+    | '/privaatsustingimused'
     | '/signup'
     | '/_auth/arved'
     | '/_auth/hinded'
@@ -406,15 +446,19 @@ export interface FileRouteTypes {
 
 export interface RootRouteChildren {
   AuthRouteRoute: typeof AuthRouteRouteWithChildren
+  KontaktRoute: typeof KontaktRoute
   LoginRoute: typeof LoginRoute
   PasswordResetRoute: typeof PasswordResetRoute
+  PrivaatsustingimusedRoute: typeof PrivaatsustingimusedRoute
   SignupRoute: typeof SignupRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
   AuthRouteRoute: AuthRouteRouteWithChildren,
+  KontaktRoute: KontaktRoute,
   LoginRoute: LoginRoute,
   PasswordResetRoute: PasswordResetRoute,
+  PrivaatsustingimusedRoute: PrivaatsustingimusedRoute,
   SignupRoute: SignupRoute,
 }
 
@@ -429,8 +473,10 @@ export const routeTree = rootRoute
       "filePath": "__root.tsx",
       "children": [
         "/_auth",
+        "/kontakt",
         "/login",
         "/password-reset",
+        "/privaatsustingimused",
         "/signup"
       ]
     },
@@ -450,11 +496,17 @@ export const routeTree = rootRoute
         "/_auth/telgid/"
       ]
     },
+    "/kontakt": {
+      "filePath": "kontakt.tsx"
+    },
     "/login": {
       "filePath": "login.tsx"
     },
     "/password-reset": {
       "filePath": "password-reset.tsx"
+    },
+    "/privaatsustingimused": {
+      "filePath": "privaatsustingimused.tsx"
     },
     "/signup": {
       "filePath": "signup.tsx"
