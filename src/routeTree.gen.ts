@@ -23,6 +23,7 @@ import { Route as AuthStatistikaImport } from './routes/_auth/statistika'
 import { Route as AuthSargidImport } from './routes/_auth/sargid'
 import { Route as AuthOigusedImport } from './routes/_auth/oigused'
 import { Route as AuthNimekiriImport } from './routes/_auth/nimekiri'
+import { Route as AuthMeilidImport } from './routes/_auth/meilid'
 import { Route as AuthMeeskonnadImport } from './routes/_auth/meeskonnad'
 import { Route as AuthHindedImport } from './routes/_auth/hinded'
 import { Route as AuthArvedImport } from './routes/_auth/arved'
@@ -100,6 +101,12 @@ const AuthOigusedRoute = AuthOigusedImport.update({
 const AuthNimekiriRoute = AuthNimekiriImport.update({
   id: '/nimekiri',
   path: '/nimekiri',
+  getParentRoute: () => AuthRouteRoute,
+} as any)
+
+const AuthMeilidRoute = AuthMeilidImport.update({
+  id: '/meilid',
+  path: '/meilid',
   getParentRoute: () => AuthRouteRoute,
 } as any)
 
@@ -206,6 +213,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthMeeskonnadImport
       parentRoute: typeof AuthRouteImport
     }
+    '/_auth/meilid': {
+      id: '/_auth/meilid'
+      path: '/meilid'
+      fullPath: '/meilid'
+      preLoaderRoute: typeof AuthMeilidImport
+      parentRoute: typeof AuthRouteImport
+    }
     '/_auth/nimekiri': {
       id: '/_auth/nimekiri'
       path: '/nimekiri'
@@ -290,6 +304,7 @@ interface AuthRouteRouteChildren {
   AuthArvedRoute: typeof AuthArvedRoute
   AuthHindedRoute: typeof AuthHindedRoute
   AuthMeeskonnadRoute: typeof AuthMeeskonnadRoute
+  AuthMeilidRoute: typeof AuthMeilidRoute
   AuthNimekiriRoute: typeof AuthNimekiriRouteWithChildren
   AuthOigusedRoute: typeof AuthOigusedRoute
   AuthSargidRoute: typeof AuthSargidRoute
@@ -304,6 +319,7 @@ const AuthRouteRouteChildren: AuthRouteRouteChildren = {
   AuthArvedRoute: AuthArvedRoute,
   AuthHindedRoute: AuthHindedRoute,
   AuthMeeskonnadRoute: AuthMeeskonnadRoute,
+  AuthMeilidRoute: AuthMeilidRoute,
   AuthNimekiriRoute: AuthNimekiriRouteWithChildren,
   AuthOigusedRoute: AuthOigusedRoute,
   AuthSargidRoute: AuthSargidRoute,
@@ -328,6 +344,7 @@ export interface FileRoutesByFullPath {
   '/arved': typeof AuthArvedRoute
   '/hinded': typeof AuthHindedRoute
   '/meeskonnad': typeof AuthMeeskonnadRoute
+  '/meilid': typeof AuthMeilidRoute
   '/nimekiri': typeof AuthNimekiriRouteWithChildren
   '/oigused': typeof AuthOigusedRoute
   '/sargid': typeof AuthSargidRoute
@@ -348,6 +365,7 @@ export interface FileRoutesByTo {
   '/arved': typeof AuthArvedRoute
   '/hinded': typeof AuthHindedRoute
   '/meeskonnad': typeof AuthMeeskonnadRoute
+  '/meilid': typeof AuthMeilidRoute
   '/nimekiri': typeof AuthNimekiriRouteWithChildren
   '/oigused': typeof AuthOigusedRoute
   '/sargid': typeof AuthSargidRoute
@@ -370,6 +388,7 @@ export interface FileRoutesById {
   '/_auth/arved': typeof AuthArvedRoute
   '/_auth/hinded': typeof AuthHindedRoute
   '/_auth/meeskonnad': typeof AuthMeeskonnadRoute
+  '/_auth/meilid': typeof AuthMeilidRoute
   '/_auth/nimekiri': typeof AuthNimekiriRouteWithChildren
   '/_auth/oigused': typeof AuthOigusedRoute
   '/_auth/sargid': typeof AuthSargidRoute
@@ -393,6 +412,7 @@ export interface FileRouteTypes {
     | '/arved'
     | '/hinded'
     | '/meeskonnad'
+    | '/meilid'
     | '/nimekiri'
     | '/oigused'
     | '/sargid'
@@ -412,6 +432,7 @@ export interface FileRouteTypes {
     | '/arved'
     | '/hinded'
     | '/meeskonnad'
+    | '/meilid'
     | '/nimekiri'
     | '/oigused'
     | '/sargid'
@@ -432,6 +453,7 @@ export interface FileRouteTypes {
     | '/_auth/arved'
     | '/_auth/hinded'
     | '/_auth/meeskonnad'
+    | '/_auth/meilid'
     | '/_auth/nimekiri'
     | '/_auth/oigused'
     | '/_auth/sargid'
@@ -486,6 +508,7 @@ export const routeTree = rootRoute
         "/_auth/arved",
         "/_auth/hinded",
         "/_auth/meeskonnad",
+        "/_auth/meilid",
         "/_auth/nimekiri",
         "/_auth/oigused",
         "/_auth/sargid",
@@ -521,6 +544,10 @@ export const routeTree = rootRoute
     },
     "/_auth/meeskonnad": {
       "filePath": "_auth/meeskonnad.tsx",
+      "parent": "/_auth"
+    },
+    "/_auth/meilid": {
+      "filePath": "_auth/meilid.tsx",
       "parent": "/_auth"
     },
     "/_auth/nimekiri": {
