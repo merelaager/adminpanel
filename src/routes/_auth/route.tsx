@@ -10,11 +10,8 @@ import { AppSidebar } from '@/components/app-sidebar.tsx'
 export const Route = createFileRoute('/_auth')({
   component: AppLayoutComponent,
   beforeLoad: ({ location }) => {
-    // const auth = await context.auth
     const user = useAuthStore.getState().user
-    // if (!auth.isAuthenticated) {
     if (!user) {
-      console.log('USER IS NOT LOGGED IN!')
       throw redirect({
         to: loginRoute.to,
         search: {
@@ -27,18 +24,14 @@ export const Route = createFileRoute('/_auth')({
 
 function AppLayoutComponent() {
   const user = useUser()
-  // const [isSidebarOpen, _] = React.useState(true)
 
   return (
     <div className="h-full">
-      {/* <Sidebar isVisible={isSidebarOpen} />*/}
       <SidebarProvider>
         <AppSidebar />
         <main className="w-full max-h-screen overflow-hidden">
           <header className="sticky top-0 bg-white flex h-16 items-center justify-between px-6">
-            {/* <Button asChild className="h-10 w-10" variant="ghost">*/}
             <SidebarTrigger />
-            {/* </Button>*/}
             <div>{user.nickname || user.name}</div>
           </header>
           <Outlet />

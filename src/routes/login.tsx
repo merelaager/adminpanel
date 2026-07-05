@@ -30,18 +30,6 @@ import { AuthCard } from '@/components/AuthCard.tsx'
 import { Route as homeRoute } from './_auth/index.tsx'
 import { submitPasswordResetRequest } from '@/requests/password-reset.ts'
 
-// export const Route = createFileRoute('/login')({
-//   component: LoginComponent,
-//   beforeLoad: async ({ context }) => {
-//     const auth = await context.auth
-//     console.log('login.tsx:', auth)
-//     if (auth.isAuthenticated) {
-//       console.log('login.tsx:', 'Redirecting to /')
-//       throw redirect({ to: fallback })
-//     }
-//   },
-// })
-
 const paramSchema = z.object({
   redirect: z.string().optional(),
 })

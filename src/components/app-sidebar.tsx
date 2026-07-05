@@ -173,7 +173,6 @@ export function AppSidebar() {
 
   return (
     <Sidebar>
-      {/* <SidebarHeader />*/}
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupContent>
@@ -228,11 +227,7 @@ export function AppSidebar() {
         </SidebarGroup>
       </SidebarContent>
       <SidebarFooter>
-        {/* <SidebarMenu>*/}
-        {/*  <SidebarMenuItem>*/}
         <ShiftSwitcher />
-        {/*  </SidebarMenuItem>*/}
-        {/* </SidebarMenu>*/}
       </SidebarFooter>
     </Sidebar>
   )

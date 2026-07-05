@@ -35,7 +35,6 @@ function RouteComponent() {
   const sortedShirts = new Map(
     [...shirtMap].sort((a, b) => String(a[0]).localeCompare(b[0])),
   )
-  console.log(sortedShirts)
 
   return (
     <div className="px-6 pb-6 flex flex-col gap-6 overflow-y-scroll h-[calc((100%-var(--spacing)*16))]">
