@@ -1,4 +1,4 @@
-import { Link, createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, Link } from '@tanstack/react-router'
 import {
   useMutation,
   useQueryClient,
@@ -12,13 +12,12 @@ import { SquareX } from 'lucide-react'
 import type { ColumnDef } from '@tanstack/table-core'
 
 import type { TentScore } from '@/requests/tents.ts'
-import { requireUser, useUser } from '@/stores/authStore.ts'
-
 import {
   addTentScore,
   deleteTentScore,
   shiftTentFetchQueryOptions,
 } from '@/requests/tents.ts'
+import { requireUser, useUser } from '@/stores/authStore.ts'
 import { Separator } from '@/components/ui/separator.tsx'
 import {
   Form,
@@ -55,10 +54,14 @@ type AddGradeCardProps = {
 const AddGradeCard = ({ shiftNr, tentNr }: AddGradeCardProps) => {
   const queryClient = useQueryClient()
 
-  const form = useForm<z.infer<typeof AddGradeSchema>>({
+  const form = useForm<
+    z.input<typeof AddGradeSchema>,
+    unknown,
+    z.output<typeof AddGradeSchema>
+  >({
     resolver: zodResolver(AddGradeSchema),
     defaultValues: {
-      score: '' as unknown as number,
+      score: '',
     },
   })
 
@@ -80,7 +83,7 @@ const AddGradeCard = ({ shiftNr, tentNr }: AddGradeCardProps) => {
     },
   })
 
-  const onSubmit = (values: z.infer<typeof AddGradeSchema>) => {
+  const onSubmit = (values: z.output<typeof AddGradeSchema>) => {
     mutation.mutate(values.score)
   }
 
@@ -98,7 +101,13 @@ const AddGradeCard = ({ shiftNr, tentNr }: AddGradeCardProps) => {
               <FormItem>
                 <FormLabel>Hinne</FormLabel>
                 <FormControl>
-                  <Input {...field} type="number" min="0" max="10" />
+                  <Input
+                    {...field}
+                    value={field.value as string | number}
+                    type="number"
+                    min="0"
+                    max="10"
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>

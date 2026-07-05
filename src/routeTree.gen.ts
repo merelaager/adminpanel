@@ -8,285 +8,394 @@
 // You should NOT make any changes in this file as it will be overwritten.
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
-// Import Routes
+import { Route as rootRouteImport } from './routes/__root'
+import { Route as SignupRouteImport } from './routes/signup'
+import { Route as PrivaatsustingimusedRouteImport } from './routes/privaatsustingimused'
+import { Route as PasswordResetRouteImport } from './routes/password-reset'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as KontaktRouteImport } from './routes/kontakt'
+import { Route as AuthRouteRouteImport } from './routes/_auth/route'
+import { Route as AuthIndexRouteImport } from './routes/_auth/index'
+import { Route as AuthTaimerRouteImport } from './routes/_auth/taimer'
+import { Route as AuthStatistikaRouteImport } from './routes/_auth/statistika'
+import { Route as AuthSargidRouteImport } from './routes/_auth/sargid'
+import { Route as AuthOigusedRouteImport } from './routes/_auth/oigused'
+import { Route as AuthNimekiriRouteImport } from './routes/_auth/nimekiri'
+import { Route as AuthMeilidRouteImport } from './routes/_auth/meilid'
+import { Route as AuthMeeskonnadRouteImport } from './routes/_auth/meeskonnad'
+import { Route as AuthHindedRouteImport } from './routes/_auth/hinded'
+import { Route as AuthArvedRouteImport } from './routes/_auth/arved'
+import { Route as AuthTelgidIndexRouteImport } from './routes/_auth/telgid.index'
+import { Route as AuthTelgidTentNrRouteImport } from './routes/_auth/telgid.$tentNr'
+import { Route as AuthNimekiriShiftNrRouteImport } from './routes/_auth/nimekiri.$shiftNr'
 
-import { Route as rootRoute } from './routes/__root'
-import { Route as SignupImport } from './routes/signup'
-import { Route as PrivaatsustingimusedImport } from './routes/privaatsustingimused'
-import { Route as PasswordResetImport } from './routes/password-reset'
-import { Route as LoginImport } from './routes/login'
-import { Route as KontaktImport } from './routes/kontakt'
-import { Route as AuthRouteImport } from './routes/_auth/route'
-import { Route as AuthIndexImport } from './routes/_auth/index'
-import { Route as AuthTaimerImport } from './routes/_auth/taimer'
-import { Route as AuthStatistikaImport } from './routes/_auth/statistika'
-import { Route as AuthSargidImport } from './routes/_auth/sargid'
-import { Route as AuthOigusedImport } from './routes/_auth/oigused'
-import { Route as AuthNimekiriImport } from './routes/_auth/nimekiri'
-import { Route as AuthMeilidImport } from './routes/_auth/meilid'
-import { Route as AuthMeeskonnadImport } from './routes/_auth/meeskonnad'
-import { Route as AuthHindedImport } from './routes/_auth/hinded'
-import { Route as AuthArvedImport } from './routes/_auth/arved'
-import { Route as AuthTelgidIndexImport } from './routes/_auth/telgid.index'
-import { Route as AuthTelgidTentNrImport } from './routes/_auth/telgid.$tentNr'
-import { Route as AuthNimekiriShiftNrImport } from './routes/_auth/nimekiri.$shiftNr'
-
-// Create/Update Routes
-
-const SignupRoute = SignupImport.update({
+const SignupRoute = SignupRouteImport.update({
   id: '/signup',
   path: '/signup',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-const PrivaatsustingimusedRoute = PrivaatsustingimusedImport.update({
+const PrivaatsustingimusedRoute = PrivaatsustingimusedRouteImport.update({
   id: '/privaatsustingimused',
   path: '/privaatsustingimused',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-const PasswordResetRoute = PasswordResetImport.update({
+const PasswordResetRoute = PasswordResetRouteImport.update({
   id: '/password-reset',
   path: '/password-reset',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-const LoginRoute = LoginImport.update({
+const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-const KontaktRoute = KontaktImport.update({
+const KontaktRoute = KontaktRouteImport.update({
   id: '/kontakt',
   path: '/kontakt',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-const AuthRouteRoute = AuthRouteImport.update({
+const AuthRouteRoute = AuthRouteRouteImport.update({
   id: '/_auth',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-const AuthIndexRoute = AuthIndexImport.update({
+const AuthIndexRoute = AuthIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AuthRouteRoute,
 } as any)
-
-const AuthTaimerRoute = AuthTaimerImport.update({
+const AuthTaimerRoute = AuthTaimerRouteImport.update({
   id: '/taimer',
   path: '/taimer',
   getParentRoute: () => AuthRouteRoute,
 } as any)
-
-const AuthStatistikaRoute = AuthStatistikaImport.update({
+const AuthStatistikaRoute = AuthStatistikaRouteImport.update({
   id: '/statistika',
   path: '/statistika',
   getParentRoute: () => AuthRouteRoute,
 } as any)
-
-const AuthSargidRoute = AuthSargidImport.update({
+const AuthSargidRoute = AuthSargidRouteImport.update({
   id: '/sargid',
   path: '/sargid',
   getParentRoute: () => AuthRouteRoute,
 } as any)
-
-const AuthOigusedRoute = AuthOigusedImport.update({
+const AuthOigusedRoute = AuthOigusedRouteImport.update({
   id: '/oigused',
   path: '/oigused',
   getParentRoute: () => AuthRouteRoute,
 } as any)
-
-const AuthNimekiriRoute = AuthNimekiriImport.update({
+const AuthNimekiriRoute = AuthNimekiriRouteImport.update({
   id: '/nimekiri',
   path: '/nimekiri',
   getParentRoute: () => AuthRouteRoute,
 } as any)
-
-const AuthMeilidRoute = AuthMeilidImport.update({
+const AuthMeilidRoute = AuthMeilidRouteImport.update({
   id: '/meilid',
   path: '/meilid',
   getParentRoute: () => AuthRouteRoute,
 } as any)
-
-const AuthMeeskonnadRoute = AuthMeeskonnadImport.update({
+const AuthMeeskonnadRoute = AuthMeeskonnadRouteImport.update({
   id: '/meeskonnad',
   path: '/meeskonnad',
   getParentRoute: () => AuthRouteRoute,
 } as any)
-
-const AuthHindedRoute = AuthHindedImport.update({
+const AuthHindedRoute = AuthHindedRouteImport.update({
   id: '/hinded',
   path: '/hinded',
   getParentRoute: () => AuthRouteRoute,
 } as any)
-
-const AuthArvedRoute = AuthArvedImport.update({
+const AuthArvedRoute = AuthArvedRouteImport.update({
   id: '/arved',
   path: '/arved',
   getParentRoute: () => AuthRouteRoute,
 } as any)
-
-const AuthTelgidIndexRoute = AuthTelgidIndexImport.update({
+const AuthTelgidIndexRoute = AuthTelgidIndexRouteImport.update({
   id: '/telgid/',
   path: '/telgid/',
   getParentRoute: () => AuthRouteRoute,
 } as any)
-
-const AuthTelgidTentNrRoute = AuthTelgidTentNrImport.update({
+const AuthTelgidTentNrRoute = AuthTelgidTentNrRouteImport.update({
   id: '/telgid/$tentNr',
   path: '/telgid/$tentNr',
   getParentRoute: () => AuthRouteRoute,
 } as any)
-
-const AuthNimekiriShiftNrRoute = AuthNimekiriShiftNrImport.update({
+const AuthNimekiriShiftNrRoute = AuthNimekiriShiftNrRouteImport.update({
   id: '/$shiftNr',
   path: '/$shiftNr',
   getParentRoute: () => AuthNimekiriRoute,
 } as any)
 
-// Populate the FileRoutesByPath interface
+export interface FileRoutesByFullPath {
+  '/': typeof AuthIndexRoute
+  '/kontakt': typeof KontaktRoute
+  '/login': typeof LoginRoute
+  '/password-reset': typeof PasswordResetRoute
+  '/privaatsustingimused': typeof PrivaatsustingimusedRoute
+  '/signup': typeof SignupRoute
+  '/arved': typeof AuthArvedRoute
+  '/hinded': typeof AuthHindedRoute
+  '/meeskonnad': typeof AuthMeeskonnadRoute
+  '/meilid': typeof AuthMeilidRoute
+  '/nimekiri': typeof AuthNimekiriRouteWithChildren
+  '/oigused': typeof AuthOigusedRoute
+  '/sargid': typeof AuthSargidRoute
+  '/statistika': typeof AuthStatistikaRoute
+  '/taimer': typeof AuthTaimerRoute
+  '/nimekiri/$shiftNr': typeof AuthNimekiriShiftNrRoute
+  '/telgid/$tentNr': typeof AuthTelgidTentNrRoute
+  '/telgid/': typeof AuthTelgidIndexRoute
+}
+export interface FileRoutesByTo {
+  '/kontakt': typeof KontaktRoute
+  '/login': typeof LoginRoute
+  '/password-reset': typeof PasswordResetRoute
+  '/privaatsustingimused': typeof PrivaatsustingimusedRoute
+  '/signup': typeof SignupRoute
+  '/arved': typeof AuthArvedRoute
+  '/hinded': typeof AuthHindedRoute
+  '/meeskonnad': typeof AuthMeeskonnadRoute
+  '/meilid': typeof AuthMeilidRoute
+  '/nimekiri': typeof AuthNimekiriRouteWithChildren
+  '/oigused': typeof AuthOigusedRoute
+  '/sargid': typeof AuthSargidRoute
+  '/statistika': typeof AuthStatistikaRoute
+  '/taimer': typeof AuthTaimerRoute
+  '/': typeof AuthIndexRoute
+  '/nimekiri/$shiftNr': typeof AuthNimekiriShiftNrRoute
+  '/telgid/$tentNr': typeof AuthTelgidTentNrRoute
+  '/telgid': typeof AuthTelgidIndexRoute
+}
+export interface FileRoutesById {
+  __root__: typeof rootRouteImport
+  '/_auth': typeof AuthRouteRouteWithChildren
+  '/kontakt': typeof KontaktRoute
+  '/login': typeof LoginRoute
+  '/password-reset': typeof PasswordResetRoute
+  '/privaatsustingimused': typeof PrivaatsustingimusedRoute
+  '/signup': typeof SignupRoute
+  '/_auth/arved': typeof AuthArvedRoute
+  '/_auth/hinded': typeof AuthHindedRoute
+  '/_auth/meeskonnad': typeof AuthMeeskonnadRoute
+  '/_auth/meilid': typeof AuthMeilidRoute
+  '/_auth/nimekiri': typeof AuthNimekiriRouteWithChildren
+  '/_auth/oigused': typeof AuthOigusedRoute
+  '/_auth/sargid': typeof AuthSargidRoute
+  '/_auth/statistika': typeof AuthStatistikaRoute
+  '/_auth/taimer': typeof AuthTaimerRoute
+  '/_auth/': typeof AuthIndexRoute
+  '/_auth/nimekiri/$shiftNr': typeof AuthNimekiriShiftNrRoute
+  '/_auth/telgid/$tentNr': typeof AuthTelgidTentNrRoute
+  '/_auth/telgid/': typeof AuthTelgidIndexRoute
+}
+export interface FileRouteTypes {
+  fileRoutesByFullPath: FileRoutesByFullPath
+  fullPaths:
+    | '/'
+    | '/kontakt'
+    | '/login'
+    | '/password-reset'
+    | '/privaatsustingimused'
+    | '/signup'
+    | '/arved'
+    | '/hinded'
+    | '/meeskonnad'
+    | '/meilid'
+    | '/nimekiri'
+    | '/oigused'
+    | '/sargid'
+    | '/statistika'
+    | '/taimer'
+    | '/nimekiri/$shiftNr'
+    | '/telgid/$tentNr'
+    | '/telgid/'
+  fileRoutesByTo: FileRoutesByTo
+  to:
+    | '/kontakt'
+    | '/login'
+    | '/password-reset'
+    | '/privaatsustingimused'
+    | '/signup'
+    | '/arved'
+    | '/hinded'
+    | '/meeskonnad'
+    | '/meilid'
+    | '/nimekiri'
+    | '/oigused'
+    | '/sargid'
+    | '/statistika'
+    | '/taimer'
+    | '/'
+    | '/nimekiri/$shiftNr'
+    | '/telgid/$tentNr'
+    | '/telgid'
+  id:
+    | '__root__'
+    | '/_auth'
+    | '/kontakt'
+    | '/login'
+    | '/password-reset'
+    | '/privaatsustingimused'
+    | '/signup'
+    | '/_auth/arved'
+    | '/_auth/hinded'
+    | '/_auth/meeskonnad'
+    | '/_auth/meilid'
+    | '/_auth/nimekiri'
+    | '/_auth/oigused'
+    | '/_auth/sargid'
+    | '/_auth/statistika'
+    | '/_auth/taimer'
+    | '/_auth/'
+    | '/_auth/nimekiri/$shiftNr'
+    | '/_auth/telgid/$tentNr'
+    | '/_auth/telgid/'
+  fileRoutesById: FileRoutesById
+}
+export interface RootRouteChildren {
+  AuthRouteRoute: typeof AuthRouteRouteWithChildren
+  KontaktRoute: typeof KontaktRoute
+  LoginRoute: typeof LoginRoute
+  PasswordResetRoute: typeof PasswordResetRoute
+  PrivaatsustingimusedRoute: typeof PrivaatsustingimusedRoute
+  SignupRoute: typeof SignupRoute
+}
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/_auth': {
-      id: '/_auth'
-      path: ''
-      fullPath: ''
-      preLoaderRoute: typeof AuthRouteImport
-      parentRoute: typeof rootRoute
-    }
-    '/kontakt': {
-      id: '/kontakt'
-      path: '/kontakt'
-      fullPath: '/kontakt'
-      preLoaderRoute: typeof KontaktImport
-      parentRoute: typeof rootRoute
-    }
-    '/login': {
-      id: '/login'
-      path: '/login'
-      fullPath: '/login'
-      preLoaderRoute: typeof LoginImport
-      parentRoute: typeof rootRoute
-    }
-    '/password-reset': {
-      id: '/password-reset'
-      path: '/password-reset'
-      fullPath: '/password-reset'
-      preLoaderRoute: typeof PasswordResetImport
-      parentRoute: typeof rootRoute
+    '/signup': {
+      id: '/signup'
+      path: '/signup'
+      fullPath: '/signup'
+      preLoaderRoute: typeof SignupRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/privaatsustingimused': {
       id: '/privaatsustingimused'
       path: '/privaatsustingimused'
       fullPath: '/privaatsustingimused'
-      preLoaderRoute: typeof PrivaatsustingimusedImport
-      parentRoute: typeof rootRoute
+      preLoaderRoute: typeof PrivaatsustingimusedRouteImport
+      parentRoute: typeof rootRouteImport
     }
-    '/signup': {
-      id: '/signup'
-      path: '/signup'
-      fullPath: '/signup'
-      preLoaderRoute: typeof SignupImport
-      parentRoute: typeof rootRoute
+    '/password-reset': {
+      id: '/password-reset'
+      path: '/password-reset'
+      fullPath: '/password-reset'
+      preLoaderRoute: typeof PasswordResetRouteImport
+      parentRoute: typeof rootRouteImport
     }
-    '/_auth/arved': {
-      id: '/_auth/arved'
-      path: '/arved'
-      fullPath: '/arved'
-      preLoaderRoute: typeof AuthArvedImport
-      parentRoute: typeof AuthRouteImport
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
     }
-    '/_auth/hinded': {
-      id: '/_auth/hinded'
-      path: '/hinded'
-      fullPath: '/hinded'
-      preLoaderRoute: typeof AuthHindedImport
-      parentRoute: typeof AuthRouteImport
+    '/kontakt': {
+      id: '/kontakt'
+      path: '/kontakt'
+      fullPath: '/kontakt'
+      preLoaderRoute: typeof KontaktRouteImport
+      parentRoute: typeof rootRouteImport
     }
-    '/_auth/meeskonnad': {
-      id: '/_auth/meeskonnad'
-      path: '/meeskonnad'
-      fullPath: '/meeskonnad'
-      preLoaderRoute: typeof AuthMeeskonnadImport
-      parentRoute: typeof AuthRouteImport
-    }
-    '/_auth/meilid': {
-      id: '/_auth/meilid'
-      path: '/meilid'
-      fullPath: '/meilid'
-      preLoaderRoute: typeof AuthMeilidImport
-      parentRoute: typeof AuthRouteImport
-    }
-    '/_auth/nimekiri': {
-      id: '/_auth/nimekiri'
-      path: '/nimekiri'
-      fullPath: '/nimekiri'
-      preLoaderRoute: typeof AuthNimekiriImport
-      parentRoute: typeof AuthRouteImport
-    }
-    '/_auth/oigused': {
-      id: '/_auth/oigused'
-      path: '/oigused'
-      fullPath: '/oigused'
-      preLoaderRoute: typeof AuthOigusedImport
-      parentRoute: typeof AuthRouteImport
-    }
-    '/_auth/sargid': {
-      id: '/_auth/sargid'
-      path: '/sargid'
-      fullPath: '/sargid'
-      preLoaderRoute: typeof AuthSargidImport
-      parentRoute: typeof AuthRouteImport
-    }
-    '/_auth/statistika': {
-      id: '/_auth/statistika'
-      path: '/statistika'
-      fullPath: '/statistika'
-      preLoaderRoute: typeof AuthStatistikaImport
-      parentRoute: typeof AuthRouteImport
-    }
-    '/_auth/taimer': {
-      id: '/_auth/taimer'
-      path: '/taimer'
-      fullPath: '/taimer'
-      preLoaderRoute: typeof AuthTaimerImport
-      parentRoute: typeof AuthRouteImport
+    '/_auth': {
+      id: '/_auth'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthRouteRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/_auth/': {
       id: '/_auth/'
       path: '/'
       fullPath: '/'
-      preLoaderRoute: typeof AuthIndexImport
-      parentRoute: typeof AuthRouteImport
+      preLoaderRoute: typeof AuthIndexRouteImport
+      parentRoute: typeof AuthRouteRoute
     }
-    '/_auth/nimekiri/$shiftNr': {
-      id: '/_auth/nimekiri/$shiftNr'
-      path: '/$shiftNr'
-      fullPath: '/nimekiri/$shiftNr'
-      preLoaderRoute: typeof AuthNimekiriShiftNrImport
-      parentRoute: typeof AuthNimekiriImport
+    '/_auth/taimer': {
+      id: '/_auth/taimer'
+      path: '/taimer'
+      fullPath: '/taimer'
+      preLoaderRoute: typeof AuthTaimerRouteImport
+      parentRoute: typeof AuthRouteRoute
+    }
+    '/_auth/statistika': {
+      id: '/_auth/statistika'
+      path: '/statistika'
+      fullPath: '/statistika'
+      preLoaderRoute: typeof AuthStatistikaRouteImport
+      parentRoute: typeof AuthRouteRoute
+    }
+    '/_auth/sargid': {
+      id: '/_auth/sargid'
+      path: '/sargid'
+      fullPath: '/sargid'
+      preLoaderRoute: typeof AuthSargidRouteImport
+      parentRoute: typeof AuthRouteRoute
+    }
+    '/_auth/oigused': {
+      id: '/_auth/oigused'
+      path: '/oigused'
+      fullPath: '/oigused'
+      preLoaderRoute: typeof AuthOigusedRouteImport
+      parentRoute: typeof AuthRouteRoute
+    }
+    '/_auth/nimekiri': {
+      id: '/_auth/nimekiri'
+      path: '/nimekiri'
+      fullPath: '/nimekiri'
+      preLoaderRoute: typeof AuthNimekiriRouteImport
+      parentRoute: typeof AuthRouteRoute
+    }
+    '/_auth/meilid': {
+      id: '/_auth/meilid'
+      path: '/meilid'
+      fullPath: '/meilid'
+      preLoaderRoute: typeof AuthMeilidRouteImport
+      parentRoute: typeof AuthRouteRoute
+    }
+    '/_auth/meeskonnad': {
+      id: '/_auth/meeskonnad'
+      path: '/meeskonnad'
+      fullPath: '/meeskonnad'
+      preLoaderRoute: typeof AuthMeeskonnadRouteImport
+      parentRoute: typeof AuthRouteRoute
+    }
+    '/_auth/hinded': {
+      id: '/_auth/hinded'
+      path: '/hinded'
+      fullPath: '/hinded'
+      preLoaderRoute: typeof AuthHindedRouteImport
+      parentRoute: typeof AuthRouteRoute
+    }
+    '/_auth/arved': {
+      id: '/_auth/arved'
+      path: '/arved'
+      fullPath: '/arved'
+      preLoaderRoute: typeof AuthArvedRouteImport
+      parentRoute: typeof AuthRouteRoute
+    }
+    '/_auth/telgid/': {
+      id: '/_auth/telgid/'
+      path: '/telgid'
+      fullPath: '/telgid/'
+      preLoaderRoute: typeof AuthTelgidIndexRouteImport
+      parentRoute: typeof AuthRouteRoute
     }
     '/_auth/telgid/$tentNr': {
       id: '/_auth/telgid/$tentNr'
       path: '/telgid/$tentNr'
       fullPath: '/telgid/$tentNr'
-      preLoaderRoute: typeof AuthTelgidTentNrImport
-      parentRoute: typeof AuthRouteImport
+      preLoaderRoute: typeof AuthTelgidTentNrRouteImport
+      parentRoute: typeof AuthRouteRoute
     }
-    '/_auth/telgid/': {
-      id: '/_auth/telgid/'
-      path: '/telgid'
-      fullPath: '/telgid'
-      preLoaderRoute: typeof AuthTelgidIndexImport
-      parentRoute: typeof AuthRouteImport
+    '/_auth/nimekiri/$shiftNr': {
+      id: '/_auth/nimekiri/$shiftNr'
+      path: '/$shiftNr'
+      fullPath: '/nimekiri/$shiftNr'
+      preLoaderRoute: typeof AuthNimekiriShiftNrRouteImport
+      parentRoute: typeof AuthNimekiriRoute
     }
   }
 }
-
-// Create and export the route tree
 
 interface AuthNimekiriRouteChildren {
   AuthNimekiriShiftNrRoute: typeof AuthNimekiriShiftNrRoute
@@ -334,147 +443,6 @@ const AuthRouteRouteWithChildren = AuthRouteRoute._addFileChildren(
   AuthRouteRouteChildren,
 )
 
-export interface FileRoutesByFullPath {
-  '': typeof AuthRouteRouteWithChildren
-  '/kontakt': typeof KontaktRoute
-  '/login': typeof LoginRoute
-  '/password-reset': typeof PasswordResetRoute
-  '/privaatsustingimused': typeof PrivaatsustingimusedRoute
-  '/signup': typeof SignupRoute
-  '/arved': typeof AuthArvedRoute
-  '/hinded': typeof AuthHindedRoute
-  '/meeskonnad': typeof AuthMeeskonnadRoute
-  '/meilid': typeof AuthMeilidRoute
-  '/nimekiri': typeof AuthNimekiriRouteWithChildren
-  '/oigused': typeof AuthOigusedRoute
-  '/sargid': typeof AuthSargidRoute
-  '/statistika': typeof AuthStatistikaRoute
-  '/taimer': typeof AuthTaimerRoute
-  '/': typeof AuthIndexRoute
-  '/nimekiri/$shiftNr': typeof AuthNimekiriShiftNrRoute
-  '/telgid/$tentNr': typeof AuthTelgidTentNrRoute
-  '/telgid': typeof AuthTelgidIndexRoute
-}
-
-export interface FileRoutesByTo {
-  '/kontakt': typeof KontaktRoute
-  '/login': typeof LoginRoute
-  '/password-reset': typeof PasswordResetRoute
-  '/privaatsustingimused': typeof PrivaatsustingimusedRoute
-  '/signup': typeof SignupRoute
-  '/arved': typeof AuthArvedRoute
-  '/hinded': typeof AuthHindedRoute
-  '/meeskonnad': typeof AuthMeeskonnadRoute
-  '/meilid': typeof AuthMeilidRoute
-  '/nimekiri': typeof AuthNimekiriRouteWithChildren
-  '/oigused': typeof AuthOigusedRoute
-  '/sargid': typeof AuthSargidRoute
-  '/statistika': typeof AuthStatistikaRoute
-  '/taimer': typeof AuthTaimerRoute
-  '/': typeof AuthIndexRoute
-  '/nimekiri/$shiftNr': typeof AuthNimekiriShiftNrRoute
-  '/telgid/$tentNr': typeof AuthTelgidTentNrRoute
-  '/telgid': typeof AuthTelgidIndexRoute
-}
-
-export interface FileRoutesById {
-  __root__: typeof rootRoute
-  '/_auth': typeof AuthRouteRouteWithChildren
-  '/kontakt': typeof KontaktRoute
-  '/login': typeof LoginRoute
-  '/password-reset': typeof PasswordResetRoute
-  '/privaatsustingimused': typeof PrivaatsustingimusedRoute
-  '/signup': typeof SignupRoute
-  '/_auth/arved': typeof AuthArvedRoute
-  '/_auth/hinded': typeof AuthHindedRoute
-  '/_auth/meeskonnad': typeof AuthMeeskonnadRoute
-  '/_auth/meilid': typeof AuthMeilidRoute
-  '/_auth/nimekiri': typeof AuthNimekiriRouteWithChildren
-  '/_auth/oigused': typeof AuthOigusedRoute
-  '/_auth/sargid': typeof AuthSargidRoute
-  '/_auth/statistika': typeof AuthStatistikaRoute
-  '/_auth/taimer': typeof AuthTaimerRoute
-  '/_auth/': typeof AuthIndexRoute
-  '/_auth/nimekiri/$shiftNr': typeof AuthNimekiriShiftNrRoute
-  '/_auth/telgid/$tentNr': typeof AuthTelgidTentNrRoute
-  '/_auth/telgid/': typeof AuthTelgidIndexRoute
-}
-
-export interface FileRouteTypes {
-  fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths:
-    | ''
-    | '/kontakt'
-    | '/login'
-    | '/password-reset'
-    | '/privaatsustingimused'
-    | '/signup'
-    | '/arved'
-    | '/hinded'
-    | '/meeskonnad'
-    | '/meilid'
-    | '/nimekiri'
-    | '/oigused'
-    | '/sargid'
-    | '/statistika'
-    | '/taimer'
-    | '/'
-    | '/nimekiri/$shiftNr'
-    | '/telgid/$tentNr'
-    | '/telgid'
-  fileRoutesByTo: FileRoutesByTo
-  to:
-    | '/kontakt'
-    | '/login'
-    | '/password-reset'
-    | '/privaatsustingimused'
-    | '/signup'
-    | '/arved'
-    | '/hinded'
-    | '/meeskonnad'
-    | '/meilid'
-    | '/nimekiri'
-    | '/oigused'
-    | '/sargid'
-    | '/statistika'
-    | '/taimer'
-    | '/'
-    | '/nimekiri/$shiftNr'
-    | '/telgid/$tentNr'
-    | '/telgid'
-  id:
-    | '__root__'
-    | '/_auth'
-    | '/kontakt'
-    | '/login'
-    | '/password-reset'
-    | '/privaatsustingimused'
-    | '/signup'
-    | '/_auth/arved'
-    | '/_auth/hinded'
-    | '/_auth/meeskonnad'
-    | '/_auth/meilid'
-    | '/_auth/nimekiri'
-    | '/_auth/oigused'
-    | '/_auth/sargid'
-    | '/_auth/statistika'
-    | '/_auth/taimer'
-    | '/_auth/'
-    | '/_auth/nimekiri/$shiftNr'
-    | '/_auth/telgid/$tentNr'
-    | '/_auth/telgid/'
-  fileRoutesById: FileRoutesById
-}
-
-export interface RootRouteChildren {
-  AuthRouteRoute: typeof AuthRouteRouteWithChildren
-  KontaktRoute: typeof KontaktRoute
-  LoginRoute: typeof LoginRoute
-  PasswordResetRoute: typeof PasswordResetRoute
-  PrivaatsustingimusedRoute: typeof PrivaatsustingimusedRoute
-  SignupRoute: typeof SignupRoute
-}
-
 const rootRouteChildren: RootRouteChildren = {
   AuthRouteRoute: AuthRouteRouteWithChildren,
   KontaktRoute: KontaktRoute,
@@ -483,112 +451,6 @@ const rootRouteChildren: RootRouteChildren = {
   PrivaatsustingimusedRoute: PrivaatsustingimusedRoute,
   SignupRoute: SignupRoute,
 }
-
-export const routeTree = rootRoute
+export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-/* ROUTE_MANIFEST_START
-{
-  "routes": {
-    "__root__": {
-      "filePath": "__root.tsx",
-      "children": [
-        "/_auth",
-        "/kontakt",
-        "/login",
-        "/password-reset",
-        "/privaatsustingimused",
-        "/signup"
-      ]
-    },
-    "/_auth": {
-      "filePath": "_auth/route.tsx",
-      "children": [
-        "/_auth/arved",
-        "/_auth/hinded",
-        "/_auth/meeskonnad",
-        "/_auth/meilid",
-        "/_auth/nimekiri",
-        "/_auth/oigused",
-        "/_auth/sargid",
-        "/_auth/statistika",
-        "/_auth/taimer",
-        "/_auth/",
-        "/_auth/telgid/$tentNr",
-        "/_auth/telgid/"
-      ]
-    },
-    "/kontakt": {
-      "filePath": "kontakt.tsx"
-    },
-    "/login": {
-      "filePath": "login.tsx"
-    },
-    "/password-reset": {
-      "filePath": "password-reset.tsx"
-    },
-    "/privaatsustingimused": {
-      "filePath": "privaatsustingimused.tsx"
-    },
-    "/signup": {
-      "filePath": "signup.tsx"
-    },
-    "/_auth/arved": {
-      "filePath": "_auth/arved.tsx",
-      "parent": "/_auth"
-    },
-    "/_auth/hinded": {
-      "filePath": "_auth/hinded.tsx",
-      "parent": "/_auth"
-    },
-    "/_auth/meeskonnad": {
-      "filePath": "_auth/meeskonnad.tsx",
-      "parent": "/_auth"
-    },
-    "/_auth/meilid": {
-      "filePath": "_auth/meilid.tsx",
-      "parent": "/_auth"
-    },
-    "/_auth/nimekiri": {
-      "filePath": "_auth/nimekiri.tsx",
-      "parent": "/_auth",
-      "children": [
-        "/_auth/nimekiri/$shiftNr"
-      ]
-    },
-    "/_auth/oigused": {
-      "filePath": "_auth/oigused.tsx",
-      "parent": "/_auth"
-    },
-    "/_auth/sargid": {
-      "filePath": "_auth/sargid.tsx",
-      "parent": "/_auth"
-    },
-    "/_auth/statistika": {
-      "filePath": "_auth/statistika.tsx",
-      "parent": "/_auth"
-    },
-    "/_auth/taimer": {
-      "filePath": "_auth/taimer.tsx",
-      "parent": "/_auth"
-    },
-    "/_auth/": {
-      "filePath": "_auth/index.tsx",
-      "parent": "/_auth"
-    },
-    "/_auth/nimekiri/$shiftNr": {
-      "filePath": "_auth/nimekiri.$shiftNr.tsx",
-      "parent": "/_auth/nimekiri"
-    },
-    "/_auth/telgid/$tentNr": {
-      "filePath": "_auth/telgid.$tentNr.tsx",
-      "parent": "/_auth"
-    },
-    "/_auth/telgid/": {
-      "filePath": "_auth/telgid.index.tsx",
-      "parent": "/_auth"
-    }
-  }
-}
-ROUTE_MANIFEST_END */
