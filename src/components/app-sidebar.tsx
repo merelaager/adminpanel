@@ -34,6 +34,7 @@ import {
 import { patchUser } from '@/requests/user.ts'
 import { useAuthStore, useUser } from '@/stores/authStore.ts'
 import { isAdminRole } from '@/lib/roles.ts'
+import { Logo } from '@/components/Logo.tsx'
 
 const topItems = [
   {
@@ -178,10 +179,7 @@ export function AppSidebar() {
           <SidebarGroupContent>
             <div className="p-6">
               <Link to={homeRoute.to} className="block w-[50px]">
-                <img
-                  src="https://merelaager.ee/img/merelaager_ship.svg"
-                  alt="Merelaagri logo"
-                />
+                <Logo />
               </Link>
             </div>
           </SidebarGroupContent>

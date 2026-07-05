@@ -19,6 +19,7 @@ import {
 } from '@/components/ui/form.tsx'
 import { Input } from '@/components/ui/input.tsx'
 import { Button } from '@/components/ui/button.tsx'
+import { Logo } from '@/components/Logo.tsx'
 import { Route as loginRoute } from '@/routes/login.tsx'
 import { resetPassword } from '@/requests/password-reset.ts'
 
@@ -83,10 +84,7 @@ function RouteComponent() {
         <Card>
           <CardHeader className="text-center">
             <div className="w-[50px] mx-auto">
-              <img
-                src="https://merelaager.ee/img/merelaager_ship.svg"
-                alt="Merelaagri logo"
-              />
+              <Logo />
             </div>
             <CardTitle>Lähtesta salasõna</CardTitle>
           </CardHeader>

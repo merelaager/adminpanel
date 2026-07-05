@@ -16,6 +16,7 @@ import reportWebVitals from './reportWebVitals.ts'
 import { NotAuthenticatedError } from '@/api/errors.ts'
 import { useAuthStore } from '@/stores/authStore.ts'
 import { RouteErrorComponent } from '@/components/RouteErrorComponent.tsx'
+import { Logo } from '@/components/Logo.tsx'
 
 import './styles.css'
 
@@ -70,10 +71,7 @@ function InnerApp() {
     return (
       <div className="h-full w-full flex flex-col items-center justify-center gap-8">
         <div className="w-[100px]">
-          <img
-            src="https://merelaager.ee/img/merelaager_ship.svg"
-            alt="Merelaagri logo"
-          />
+          <Logo />
         </div>
         <p>Laen...</p>
       </div>
@@ -84,10 +82,7 @@ function InnerApp() {
     return (
       <div className="h-full w-full flex flex-col items-center justify-center gap-8">
         <div className="w-[100px]">
-          <img
-            src="https://merelaager.ee/img/merelaager_ship.svg"
-            alt="Merelaagri logo"
-          />
+          <Logo />
         </div>
         <p>Viga rakenduse käivitamisel. Rohkem infot konsoolis.</p>
       </div>
