@@ -2,8 +2,7 @@ import { StrictMode, useEffect } from 'react'
 import ReactDOM from 'react-dom/client'
 
 import { RouterProvider, createRouter } from '@tanstack/react-router'
-import { QueryClient } from '@tanstack/query-core'
-import { QueryClientProvider } from '@tanstack/react-query'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 
 import { routeTree } from './routeTree.gen'
 import reportWebVitals from './reportWebVitals.ts'
