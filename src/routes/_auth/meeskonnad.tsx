@@ -9,7 +9,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 
 import { toast } from 'sonner'
-import { useEffect } from 'react'
+import { useEffect, useMemo } from 'react'
 import { CircleMinus } from 'lucide-react'
 import type { CamperRecord } from '@/requests/shift-records.ts'
 import type { TeamCreationData, TeamRecord } from '@/requests/teams.ts'
@@ -231,21 +231,18 @@ function RouteComponent() {
   )
   const { data: teams } = useSuspenseQuery(shiftTeamsFetchQueryOptions(shiftNr))
 
-  const teamlessCampers: Array<CamperRecord> = []
-  const assignedCampers = new Map<number, Array<CamperRecord>>()
+  const { teamlessCampers, assignedCampers, warnings } = useMemo(() => {
+    const teamless: Array<CamperRecord> = []
+    const assigned = new Map<number, Array<CamperRecord>>()
+    teams.forEach((team) => assigned.set(team.id, []))
+    const warningQueue: Array<string> = []
 
-  teams.forEach((team) => {
-    assignedCampers.set(team.id, [])
-  })
-
-  const warningQueue: Array<string> = []
-
-  records.forEach((record) => {
-    if (record.teamId === null) teamlessCampers.push(record)
-    else {
-      const teamMembers = assignedCampers.get(
-        record.teamId,
-      ) as Array<CamperRecord>
+    records.forEach((record) => {
+      if (record.teamId === null) {
+        teamless.push(record)
+        return
+      }
+      const teamMembers = assigned.get(record.teamId)
       if (!teamMembers) {
         warningQueue.push(
           `${record.childName} on vale vahetuse meeskonnas. (recordRef: ${record.id})`,
@@ -253,19 +250,24 @@ function RouteComponent() {
         return
       }
       teamMembers.push(record)
-    }
-  })
+    })
 
-  teamlessCampers.sort((a, b) => a.childName.localeCompare(b.childName))
+    teamless.sort((a, b) => a.childName.localeCompare(b.childName))
+
+    return {
+      teamlessCampers: teamless,
+      assignedCampers: assigned,
+      warnings: warningQueue,
+    }
+  }, [records, teams])
+
   const sortedTeams = [...teams].sort((a, b) => a.name.localeCompare(b.name))
 
   useEffect(() => {
-    warningQueue.forEach((message) => {
-      toast.warning('Ebakõla andmetes!', {
-        description: message,
-      })
+    warnings.forEach((message) => {
+      toast.warning('Ebakõla andmetes!', { description: message })
     })
-  }, [])
+  }, [warnings])
 
   return (
     <div className="px-6 pb-6 flex flex-col gap-6 overflow-y-scroll h-[calc((100%-var(--spacing)*16))]">
@@ -290,7 +292,7 @@ function RouteComponent() {
           <TeamBox
             key={team.id}
             team={team}
-            members={assignedCampers.get(team.id) as Array<CamperRecord>}
+            members={assignedCampers.get(team.id) ?? []}
           />
         ))}
       </div>
