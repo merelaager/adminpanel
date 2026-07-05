@@ -1,4 +1,4 @@
-import { createFileRoute, redirect } from '@tanstack/react-router'
+import { createFileRoute, redirect, useRouter } from '@tanstack/react-router'
 import { z } from 'zod'
 
 import { useAuthStore } from '@/stores/authStore.ts'
@@ -47,8 +47,13 @@ import { submitPasswordResetRequest } from '@/requests/password-reset.ts'
 //   },
 // })
 
+const paramSchema = z.object({
+  redirect: z.string().optional(),
+})
+
 export const Route = createFileRoute('/login')({
   component: LoginComponent,
+  validateSearch: paramSchema,
   beforeLoad: () => {
     const user = useAuthStore.getState().user
     if (user) {
@@ -130,6 +135,8 @@ const PasswordReset = () => {
 function LoginComponent() {
   const { login } = useAuthStore()
   const navigate = Route.useNavigate()
+  const router = useRouter()
+  const search = Route.useSearch()
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -158,9 +165,11 @@ function LoginComponent() {
         return
       }
 
-      // await router.invalidate()
-      console.log('navigating')
-      navigate({ to: homeRoute.to, replace: true })
+      if (search.redirect) {
+        router.history.push(search.redirect)
+      } else {
+        navigate({ to: homeRoute.to, replace: true })
+      }
     } catch (error) {
       console.error('Error logging in: ', error)
       toast.error('Viga sisselogimisel!', {
