@@ -1,9 +1,8 @@
-import * as React from 'react'
 import { createFileRoute } from '@tanstack/react-router'
-import { useSuspenseQueries } from '@tanstack/react-query'
+import { useSuspenseQuery } from '@tanstack/react-query'
 
 import { requireUser, useUser } from '@/stores/authStore.ts'
-import { registrationsQueryOptions } from '@/requests/registrations.ts'
+import { shiftEmailsQueryOptions } from '@/requests/shift-emails.ts'
 import { Button } from '@/components/ui/button.tsx'
 import { requireAdmin } from '@/lib/roles.ts'
 
@@ -11,27 +10,17 @@ export const Route = createFileRoute('/_auth/meilid')({
   component: RouteComponent,
   beforeLoad: requireAdmin,
   loader: ({ context: { queryClient } }) => {
-    const shiftNr = requireUser().currentShift
-    return queryClient.ensureQueryData(registrationsQueryOptions(shiftNr))
+    return queryClient.ensureQueryData(
+      shiftEmailsQueryOptions(requireUser().currentShift),
+    )
   },
 })
 
 function RouteComponent() {
   const shiftNr = useUser().currentShift
 
-  const results = useSuspenseQueries({
-    queries: [registrationsQueryOptions(shiftNr)],
-  })
-
-  const emails = React.useMemo(() => {
-    const seen = new Set<string>()
-    for (const result of results) {
-      for (const reg of result.data) {
-        if (reg.isRegistered && reg.contactEmail) seen.add(reg.contactEmail)
-      }
-    }
-    return Array.from(seen).sort()
-  }, [results])
+  const { data } = useSuspenseQuery(shiftEmailsQueryOptions(shiftNr))
+  const emails = [...data].sort()
 
   const download = () => {
     const date = new Date().toISOString().slice(0, 10).replace(/-/g, '')
