@@ -66,13 +66,12 @@ const AddGradeCard = ({ shiftNr, tentNr }: AddGradeCardProps) => {
     mutationFn: (score: number) => {
       return addTentScore(shiftNr, tentNr, score)
     },
-    onSuccess: async () => {
-      // TODO: do not re-fetch all, but only add the returned score to list.
-      await queryClient.invalidateQueries({
-        queryKey: ['tent', shiftNr, tentNr],
-        refetchType: 'active',
-      })
-      form.setValue('score', 0)
+    onSuccess: (newScore) => {
+      queryClient.setQueryData(
+        shiftTentFetchQueryOptions(shiftNr, tentNr).queryKey,
+        (old) => old && { ...old, scores: [...old.scores, newScore] },
+      )
+      form.reset()
     },
     onError: (error: Error) => {
       toast.error('Viga hindamisel!', {
