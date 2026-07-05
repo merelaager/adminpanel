@@ -372,7 +372,7 @@ export const RegistrationDataTable = ({
     })
   }
 
-  const sample = registrations[0]
+  const sample = registrations.at(0)
   const isFinanceAvailable = sample?.pricePaid !== undefined
   const hasContact = !!sample?.contactName
 

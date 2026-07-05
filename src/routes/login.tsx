@@ -1,12 +1,12 @@
 import { createFileRoute, redirect, useRouter } from '@tanstack/react-router'
 import { z } from 'zod'
 
-import { useAuthStore } from '@/stores/authStore.ts'
-
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-
 import { zodResolver } from '@hookform/resolvers/zod'
+import { Route as homeRoute } from './_auth/index.tsx'
+import { useAuthStore } from '@/stores/authStore.ts'
+
 import {
   Form,
   FormControl,
@@ -27,7 +27,6 @@ import { Input } from '@/components/ui/input.tsx'
 import { Button } from '@/components/ui/button.tsx'
 import { AuthCard } from '@/components/AuthCard.tsx'
 
-import { Route as homeRoute } from './_auth/index.tsx'
 import { submitPasswordResetRequest } from '@/requests/password-reset.ts'
 
 const paramSchema = z.object({

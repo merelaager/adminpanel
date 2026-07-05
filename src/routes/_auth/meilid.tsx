@@ -26,7 +26,10 @@ function RouteComponent() {
   const download = () => {
     const date = new Date().toISOString().slice(0, 10).replace(/-/g, '')
     const filename = `${shiftNr}v-meilid-${date}.txt`
-    downloadBlob(new Blob([emails.join('\n')], { type: 'text/plain' }), filename)
+    downloadBlob(
+      new Blob([emails.join('\n')], { type: 'text/plain' }),
+      filename,
+    )
   }
 
   return (

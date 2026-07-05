@@ -1,8 +1,7 @@
 import { Link } from '@tanstack/react-router'
 
-import { Button } from '@/components/ui/button.tsx'
-
 import { Route as registrationRoute } from '../routes/_auth/nimekiri.$shiftNr.tsx'
+import { Button } from '@/components/ui/button.tsx'
 
 export const ShiftNav = () => {
   return [1, 2, 3, 4].map((shiftId) => (

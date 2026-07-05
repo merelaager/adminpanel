@@ -1,11 +1,7 @@
 import * as React from 'react'
-import {
-  type ColumnDef,
-  getCoreRowModel,
-  getSortedRowModel,
-  type SortingState,
-} from '@tanstack/table-core'
+import { getCoreRowModel, getSortedRowModel } from '@tanstack/table-core'
 import { flexRender, useReactTable } from '@tanstack/react-table'
+import type { ColumnDef, SortingState } from '@tanstack/table-core'
 
 import {
   Table,
@@ -17,8 +13,8 @@ import {
 } from '@/components/ui/table.tsx'
 
 interface DataTableProps<TData, TValue> {
-  columns: ColumnDef<TData, TValue>[]
-  data: TData[]
+  columns: Array<ColumnDef<TData, TValue>>
+  data: Array<TData>
 }
 
 export function DataTable<TData, TValue>({

@@ -3,9 +3,10 @@ import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 
-import { type SignupBody, signupUser } from '@/requests/user.ts'
-
 import { toast } from 'sonner'
+import type { SignupBody } from '@/requests/user.ts'
+import { signupUser } from '@/requests/user.ts'
+
 import {
   Form,
   FormControl,
