@@ -2,9 +2,11 @@ import { createFileRoute } from '@tanstack/react-router'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { registrationsQueryOptions } from '@/requests/registrations.ts'
 import { requireUser, useUser } from '@/stores/authStore.ts'
+import { requireAdmin } from '@/lib/roles.ts'
 
 export const Route = createFileRoute('/_auth/sargid')({
   component: RouteComponent,
+  beforeLoad: requireAdmin,
   loader: ({ context: { queryClient } }) => {
     queryClient.ensureQueryData(
       registrationsQueryOptions(requireUser().currentShift),

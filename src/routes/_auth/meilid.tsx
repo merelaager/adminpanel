@@ -5,9 +5,11 @@ import { useSuspenseQueries } from '@tanstack/react-query'
 import { requireUser, useUser } from '@/stores/authStore.ts'
 import { registrationsQueryOptions } from '@/requests/registrations.ts'
 import { Button } from '@/components/ui/button.tsx'
+import { requireAdmin } from '@/lib/roles.ts'
 
 export const Route = createFileRoute('/_auth/meilid')({
   component: RouteComponent,
+  beforeLoad: requireAdmin,
   loader: ({ context: { queryClient } }) => {
     const shiftNr = requireUser().currentShift
     return queryClient.ensureQueryData(registrationsQueryOptions(shiftNr))

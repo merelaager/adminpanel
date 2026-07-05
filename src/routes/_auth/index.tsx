@@ -11,6 +11,7 @@ import type {
   StaffCertificate,
 } from '@/requests/shift-staff.ts'
 import { requireUser, useUser } from '@/stores/authStore.ts'
+import { isAdminRole } from '@/lib/roles.ts'
 
 import { shiftStaffFetchQueryOptions } from '@/requests/shift-staff.ts'
 import { Separator } from '@/components/ui/separator.tsx'
@@ -360,7 +361,7 @@ function App() {
   const shiftNr = user.currentShift
   const currentRole = user.currentRole
 
-  const canInvite = ['root', 'boss'].includes(currentRole)
+  const canInvite = isAdminRole(currentRole)
 
   const { data: staff } = useSuspenseQuery(shiftStaffFetchQueryOptions(shiftNr))
 

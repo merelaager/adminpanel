@@ -11,6 +11,7 @@ import type { ColumnDef } from '@tanstack/table-core'
 import type { ChildBillData, ParentBillData } from '@/requests/billing.ts'
 import { requireUser, useUser } from '@/stores/authStore.ts'
 import { updateListItem } from '@/lib/query-cache.ts'
+import { requireAdmin } from '@/lib/roles.ts'
 
 import {
   fetchBillPdf,
@@ -35,6 +36,7 @@ import { DataTable } from '@/components/data-table.tsx'
 
 export const Route = createFileRoute('/_auth/arved')({
   component: RouteComponent,
+  beforeLoad: requireAdmin,
   loader: ({ context: { queryClient } }) => {
     const shiftNr = requireUser().currentShift
     queryClient.ensureQueryData(shiftBillingFetchQueryOptions(shiftNr))

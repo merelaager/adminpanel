@@ -15,6 +15,7 @@ import reportWebVitals from './reportWebVitals.ts'
 
 import { NotAuthenticatedError } from '@/api/errors.ts'
 import { useAuthStore } from '@/stores/authStore.ts'
+import { RouteErrorComponent } from '@/components/RouteErrorComponent.tsx'
 
 import './styles.css'
 
@@ -48,6 +49,7 @@ const router = createRouter({
   scrollRestoration: true,
   defaultStructuralSharing: true,
   defaultPreloadStaleTime: 0,
+  defaultErrorComponent: RouteErrorComponent,
 })
 
 // Register the router instance for type safety

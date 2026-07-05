@@ -1,17 +1,16 @@
 import * as React from 'react'
-import { createFileRoute, useRouter } from '@tanstack/react-router'
+import { createFileRoute } from '@tanstack/react-router'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { getCoreRowModel, getSortedRowModel } from '@tanstack/table-core'
 import { flexRender, useReactTable } from '@tanstack/react-table'
 
 import { ArrowUpDown } from 'lucide-react'
-import { toast } from 'sonner'
-import { Route as homeRoute } from './index.tsx'
 import type { ColumnDef, SortingState } from '@tanstack/table-core'
 import type { ShiftUser } from '@/requests/shift-users.ts'
 import { Button } from '@/components/ui/button.tsx'
 
 import { requireUser, useUser } from '@/stores/authStore.ts'
+import { requireAdmin } from '@/lib/roles.ts'
 
 import {
   Table,
@@ -26,7 +25,7 @@ import { shiftUsersFetchQueryOptions } from '@/requests/shift-users.ts'
 
 export const Route = createFileRoute('/_auth/oigused')({
   component: RouteComponent,
-  errorComponent: ErrorComponent,
+  beforeLoad: requireAdmin,
   loader: ({ context: { queryClient } }) => {
     const shiftNr = requireUser().currentShift
     queryClient.ensureQueryData(shiftUsersFetchQueryOptions(shiftNr))
@@ -122,23 +121,6 @@ function DataTable<TData, TValue>({
       </Table>
     </div>
   )
-}
-
-function ErrorComponent({ error }: { error: Error }) {
-  const router = useRouter()
-
-  React.useEffect(() => {
-    toast.error('Viga lehe laadimisel!', {
-      description: error.message,
-      duration: Infinity,
-      action: {
-        label: 'Tagasi kaldale',
-        onClick: () => router.navigate(homeRoute),
-      },
-    })
-  }, [])
-
-  return null
 }
 
 function RouteComponent() {

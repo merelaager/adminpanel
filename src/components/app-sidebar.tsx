@@ -33,6 +33,7 @@ import {
 } from '@/components/ui/dropdown-menu.tsx'
 import { patchUser } from '@/requests/user.ts'
 import { useAuthStore, useUser } from '@/stores/authStore.ts'
+import { isAdminRole } from '@/lib/roles.ts'
 
 const topItems = [
   {
@@ -60,7 +61,11 @@ const shiftItems = [
   },
 ]
 
-const adminItems = [
+const adminItems: Array<{
+  title: string
+  url: string
+  adminOnly?: boolean
+}> = [
   {
     title: 'Nimekiri',
     url: registrationsRoute.to,
@@ -68,14 +73,17 @@ const adminItems = [
   {
     title: 'Arved',
     url: billsRoute.to,
+    adminOnly: true,
   },
   {
     title: 'T-särgid',
     url: shirtsRoute.to,
+    adminOnly: true,
   },
   {
     title: 'Õigused',
     url: permissionsRoute.to,
+    adminOnly: true,
   },
   {
     title: 'Statistika',
@@ -84,6 +92,7 @@ const adminItems = [
   {
     title: 'Meilid',
     url: emailsRoute.to,
+    adminOnly: true,
   },
 ]
 
@@ -159,8 +168,7 @@ const ShiftSwitcher = () => {
 
 export function AppSidebar() {
   const currentRole = useUser().currentRole
-  const isAdmin = ['root', 'boss'].includes(currentRole)
-  const adminPages = ['Arved', 'Õigused', 'T-särgid', 'Meilid']
+  const isAdmin = isAdminRole(currentRole)
 
   return (
     <Sidebar>
@@ -207,7 +215,7 @@ export function AppSidebar() {
         <SidebarGroup>
           <SidebarGroupContent>
             {adminItems.map((item) => {
-              if (!isAdmin && adminPages.includes(item.title)) return null
+              if (item.adminOnly && !isAdmin) return null
               return (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
