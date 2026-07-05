@@ -31,7 +31,6 @@ import {
 } from '@/components/ui/alert-dialog.tsx'
 import { Input } from '@/components/ui/input.tsx'
 import { Button } from '@/components/ui/button.tsx'
-import { Toaster } from '@/components/ui/sonner.tsx'
 
 import { Route as homeRoute } from './_auth/index.tsx'
 import { submitPasswordResetRequest } from '@/requests/password-reset.ts'
@@ -172,7 +171,6 @@ function LoginComponent() {
 
   return (
     <div className="w-full flex items-center h-auto sm:items-start top-1/4 relative">
-      <Toaster position="top-center" />
       <div className="px-6 w-full max-w-sm mx-auto">
         <Card>
           <CardHeader className="text-center">

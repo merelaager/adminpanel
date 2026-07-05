@@ -3,7 +3,6 @@ import { Outlet, createFileRoute, redirect } from '@tanstack/react-router'
 import { Route as loginRoute } from '../login.tsx'
 import { useAuthStore, useUser } from '@/stores/authStore.ts'
 
-import { Toaster } from '@/components/ui/sonner.tsx'
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar.tsx'
 
 import { AppSidebar } from '@/components/app-sidebar.tsx'
@@ -32,7 +31,6 @@ function AppLayoutComponent() {
 
   return (
     <div className="h-full">
-      <Toaster position="top-center" />
       {/* <Sidebar isVisible={isSidebarOpen} />*/}
       <SidebarProvider>
         <AppSidebar />
