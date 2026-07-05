@@ -185,7 +185,6 @@ const registrationColumns: Array<ColumnDef<RegistrationEntry>> = [
       return (
         <div className="flex justify-between gap-4">
           <ChildRecordsSheet
-            shiftNr={registration.shiftNr}
             childId={registration.childId}
             childName={registration.child.name}
           />

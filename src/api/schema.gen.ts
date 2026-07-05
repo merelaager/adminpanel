@@ -797,9 +797,9 @@ export interface paths {
         };
         get: {
             parameters: {
-                query: {
-                    shiftNr: number;
-                    childId: number;
+                query?: {
+                    shiftNr?: number;
+                    childId?: number;
                 };
                 header?: never;
                 path?: never;

@@ -10,18 +10,17 @@ export type ChildRecord = SuccessData<
 >['records'][number]
 
 export const fetchChildRecords = async (
-  shiftNr: number,
   childId: number,
 ): Promise<Array<ChildRecord>> => {
   const { data, error, response } = await client.GET('/api/records/', {
-    params: { query: { shiftNr, childId } },
+    params: { query: { childId } },
   })
   if (error !== undefined) throw toApiError(response.status, error)
   return unwrapData(data).records
 }
 
-export const childRecordsQueryOptions = (shiftNr: number, childId: number) =>
+export const childRecordsQueryOptions = (childId: number) =>
   queryOptions({
-    queryKey: ['records', 'child', shiftNr, childId],
-    queryFn: () => fetchChildRecords(shiftNr, childId),
+    queryKey: ['records', 'child', childId],
+    queryFn: () => fetchChildRecords(childId),
   })
