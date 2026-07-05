@@ -2,10 +2,10 @@ import { createFileRoute } from '@tanstack/react-router'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { Bar, BarChart, CartesianGrid, XAxis } from 'recharts'
 
-import { getUserShift } from '@/utils.ts'
+import type { ChartConfig } from '@/components/ui/chart'
+import { requireUser, useUser } from '@/stores/authStore.ts'
 
 import {
-  type ChartConfig,
   ChartContainer,
   ChartLegend,
   ChartLegendContent,
@@ -26,7 +26,7 @@ import { Separator } from '@/components/ui/separator.tsx'
 export const Route = createFileRoute('/_auth/statistika')({
   component: RouteComponent,
   loader: ({ context: { queryClient } }) => {
-    const shiftNr = getUserShift()
+    const shiftNr = requireUser().currentShift
     queryClient.ensureQueryData(shiftRecordsFetchQueryOptions(shiftNr))
   },
 })
@@ -46,7 +46,7 @@ const chartConfig = {
 } satisfies ChartConfig
 
 function RouteComponent() {
-  const shiftNr = getUserShift()
+  const shiftNr = useUser().currentShift
 
   const { data: records } = useSuspenseQuery(
     shiftRecordsFetchQueryOptions(shiftNr),

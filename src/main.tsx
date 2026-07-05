@@ -1,14 +1,13 @@
 import { StrictMode, useEffect } from 'react'
 import ReactDOM from 'react-dom/client'
 
-import { createRouter, RouterProvider } from '@tanstack/react-router'
+import { RouterProvider, createRouter } from '@tanstack/react-router'
 import { QueryClient } from '@tanstack/query-core'
 import { QueryClientProvider } from '@tanstack/react-query'
 
 import { routeTree } from './routeTree.gen'
 import reportWebVitals from './reportWebVitals.ts'
 
-import { AuthProvider } from '@/auth.tsx'
 import { useAuthStore } from '@/stores/authStore.ts'
 
 import './styles.css'
@@ -19,7 +18,6 @@ const queryClient = new QueryClient()
 const router = createRouter({
   routeTree,
   context: {
-    auth: undefined!,
     queryClient,
   },
   defaultPreload: 'intent',
@@ -35,17 +33,7 @@ declare module '@tanstack/react-router' {
   }
 }
 
-// https://github.com/TanStack/router/discussions/1668#discussioncomment-10634735
-// const authClient = Promise.withResolvers<AuthContext>()
-
 function InnerApp() {
-  // const auth = useAuth()
-  //
-  // useEffect(() => {
-  //   if (auth.isLoading) return
-  //
-  //   authClient.resolve(auth)
-  // }, [auth.isAuthenticated, auth.isLoading])
   const { fetchUser, isLoading, isError } = useAuthStore()
 
   useEffect(() => {
@@ -80,21 +68,13 @@ function InnerApp() {
     )
   }
 
-  return (
-    <RouterProvider
-      router={router}
-      context={{ queryClient }}
-      // context={{ queryClient, auth: authClient.promise }}
-    />
-  )
+  return <RouterProvider router={router} context={{ queryClient }} />
 }
 
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <InnerApp />
-      </AuthProvider>
+      <InnerApp />
     </QueryClientProvider>
   )
 }

@@ -1,16 +1,13 @@
-import { createFileRoute, Link } from '@tanstack/react-router'
-import {
-  useMutation,
-  useQueryClient,
-  useSuspenseQuery,
-} from '@tanstack/react-query'
-
-import { getUserShift } from '@/utils.ts'
+import { Link, createFileRoute } from '@tanstack/react-router'
+import { useSuspenseQuery } from '@tanstack/react-query'
 
 import { CircleMinus } from 'lucide-react'
-import { toast } from 'sonner'
-
+import { Route as tentRoute } from './telgid.$tentNr.tsx'
 import type { CheckedState } from '@radix-ui/react-checkbox'
+import type { CamperRecord } from '@/requests/shift-records.ts'
+import { requireUser, useUser } from '@/stores/authStore.ts'
+import { usePatchShiftRecord } from '@/hooks/use-patch-shift-record.ts'
+
 import { Checkbox } from '@/components/ui/checkbox'
 import { Separator } from '@/components/ui/separator.tsx'
 import {
@@ -28,19 +25,12 @@ import {
   SelectValue,
 } from '@/components/ui/select.tsx'
 
-import {
-  type CamperRecord,
-  patchShiftRecord,
-  type RecordPatchObject,
-  shiftRecordsFetchQueryOptions,
-} from '@/requests/shift-records.ts'
-
-import { Route as tentRoute } from './telgid.$tentNr.tsx'
+import { shiftRecordsFetchQueryOptions } from '@/requests/shift-records.ts'
 
 export const Route = createFileRoute('/_auth/telgid/')({
   component: RouteComponent,
   loader: ({ context: { queryClient } }) => {
-    const shiftNr = getUserShift()
+    const shiftNr = requireUser().currentShift
     queryClient.ensureQueryData(shiftRecordsFetchQueryOptions(shiftNr))
   },
 })
@@ -78,7 +68,7 @@ const TentlessChild = ({ record }: TentlessChildProps) => {
 
 type TentlessChildrenProps = {
   heading: string
-  records: CamperRecord[]
+  records: Array<CamperRecord>
 }
 
 function TentlessChildren({ heading, records }: TentlessChildrenProps) {
@@ -145,7 +135,7 @@ const TentCamperEntry = ({ record }: TentCamperEntryProps) => {
 
 type TentBoxProps = {
   tentKey: string
-  records: CamperRecord[]
+  records: Array<CamperRecord>
 }
 
 const TentBox = ({ tentKey, records }: TentBoxProps) => {
@@ -171,15 +161,15 @@ const TentBox = ({ tentKey, records }: TentBoxProps) => {
 }
 
 function RouteComponent() {
-  const shiftNr = getUserShift()
+  const shiftNr = useUser().currentShift
 
   const { data: records } = useSuspenseQuery(
     shiftRecordsFetchQueryOptions(shiftNr),
   )
 
-  const tentlessBoys: CamperRecord[] = []
-  const tentlessGirls: CamperRecord[] = []
-  const tentList: { [key: number]: CamperRecord[] } = {
+  const tentlessBoys: Array<CamperRecord> = []
+  const tentlessGirls: Array<CamperRecord> = []
+  const tentList: { [key: number]: Array<CamperRecord> } = {
     1: [],
     2: [],
     3: [],
@@ -222,35 +212,4 @@ function RouteComponent() {
       </div>
     </div>
   )
-}
-
-export const usePatchShiftRecord = (record: CamperRecord) => {
-  const queryClient = useQueryClient()
-
-  return useMutation({
-    mutationFn: (patchData: RecordPatchObject) => {
-      return patchShiftRecord(record.id, patchData)
-    },
-    onSuccess: (_, newState) => {
-      const queryKey = ['records', record.shiftNr]
-      const staleData = queryClient.getQueryData<CamperRecord[]>(queryKey)
-      if (!staleData) return
-
-      const updatedData = [...staleData]
-      const index = updatedData.findIndex((r) => r.id === record.id)
-      if (index === -1) return
-
-      updatedData[index] = {
-        ...updatedData[index],
-        ...newState,
-      }
-
-      queryClient.setQueryData(queryKey, updatedData)
-    },
-    onError: (error: Error) => {
-      toast.error('Viga andmete uuendamisel!', {
-        description: error.message,
-      })
-    },
-  })
 }

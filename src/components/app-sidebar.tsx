@@ -1,12 +1,8 @@
 import { Link } from '@tanstack/react-router'
 
-import {
-  getCurrentRole,
-  getUserId,
-  getUserShift,
-  getUserShifts,
-} from '@/utils.ts'
-
+import { ChevronsUpDown } from 'lucide-react'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { toast } from 'sonner'
 import { Route as homeRoute } from '../routes/_auth/index.tsx'
 import { Route as registrationsRoute } from '../routes/_auth/nimekiri.tsx'
 import { Route as billsRoute } from '../routes/_auth/arved.tsx'
@@ -19,7 +15,7 @@ import { Route as shirtsRoute } from '../routes/_auth/sargid.tsx'
 import { Route as statsRoute } from '../routes/_auth/statistika.tsx'
 import { Route as emailsRoute } from '../routes/_auth/meilid.tsx'
 
-import { ChevronsUpDown } from 'lucide-react'
+import type { PatchUserBody } from '@/requests/user.ts'
 import {
   Sidebar,
   SidebarContent,
@@ -35,10 +31,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu.tsx'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { patchUser, type PatchUserBody } from '@/requests/user.ts'
-import { toast } from 'sonner'
-import { useAuthStore } from '@/stores/authStore.ts'
+import { patchUser } from '@/requests/user.ts'
+import { useAuthStore, useUser } from '@/stores/authStore.ts'
 
 const topItems = [
   {
@@ -94,9 +88,10 @@ const adminItems = [
 ]
 
 const ShiftSwitcher = () => {
-  const currentShift = getUserShift()
-  const shifts = getUserShifts()
-  const userId = getUserId()
+  const user = useUser()
+  const currentShift = user.currentShift
+  const shifts = user.managedShifts
+  const userId = user.userId
 
   const updateCurrentShift = useAuthStore((state) => state.updateCurrentShift)
   const queryClient = useQueryClient()
@@ -163,13 +158,13 @@ const ShiftSwitcher = () => {
 }
 
 export function AppSidebar() {
-  const currentRole = getCurrentRole()
+  const currentRole = useUser().currentRole
   const isAdmin = ['root', 'boss'].includes(currentRole)
   const adminPages = ['Arved', 'Õigused', 'T-särgid', 'Meilid']
 
   return (
     <Sidebar>
-      {/*<SidebarHeader />*/}
+      {/* <SidebarHeader />*/}
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupContent>
@@ -227,11 +222,11 @@ export function AppSidebar() {
         </SidebarGroup>
       </SidebarContent>
       <SidebarFooter>
-        {/*<SidebarMenu>*/}
+        {/* <SidebarMenu>*/}
         {/*  <SidebarMenuItem>*/}
         <ShiftSwitcher />
         {/*  </SidebarMenuItem>*/}
-        {/*</SidebarMenu>*/}
+        {/* </SidebarMenu>*/}
       </SidebarFooter>
     </Sidebar>
   )

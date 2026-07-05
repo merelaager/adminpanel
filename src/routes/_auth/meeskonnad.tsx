@@ -8,17 +8,17 @@ import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 
-import { getUserShift } from '@/utils.ts'
+import { toast } from 'sonner'
+import { useEffect } from 'react'
+import { CircleMinus } from 'lucide-react'
+import type { CamperRecord } from '@/requests/shift-records.ts'
+import type { TeamCreationData, TeamRecord } from '@/requests/teams.ts'
+import { requireUser, useUser } from '@/stores/authStore.ts'
 
-import {
-  type CamperRecord,
-  shiftRecordsFetchQueryOptions,
-} from '@/requests/shift-records.ts'
+import { shiftRecordsFetchQueryOptions } from '@/requests/shift-records.ts'
 import {
   createShiftTeam,
   shiftTeamsFetchQueryOptions,
-  type TeamCreationData,
-  type TeamRecord,
 } from '@/requests/teams.ts'
 
 import { Separator } from '@/components/ui/separator.tsx'
@@ -41,27 +41,24 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form.tsx'
-import { toast } from 'sonner'
-import { usePatchShiftRecord } from '@/routes/_auth/telgid.index.tsx'
-import { useEffect } from 'react'
+import { usePatchShiftRecord } from '@/hooks/use-patch-shift-record.ts'
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from '@/components/ui/tooltip.tsx'
-import { CircleMinus } from 'lucide-react'
 
 export const Route = createFileRoute('/_auth/meeskonnad')({
   component: RouteComponent,
   loader: ({ context: { queryClient } }) => {
-    const shiftNr = getUserShift()
+    const shiftNr = requireUser().currentShift
     queryClient.ensureQueryData(shiftRecordsFetchQueryOptions(shiftNr))
     queryClient.ensureQueryData(shiftTeamsFetchQueryOptions(shiftNr))
   },
 })
 
 type TeamBoxProps = {
-  members: CamperRecord[]
+  members: Array<CamperRecord>
   team: TeamRecord
 }
 
@@ -96,7 +93,7 @@ const TeamBox = ({ members, team }: TeamBoxProps) => {
 
 type TeamlessChildProps = {
   record: CamperRecord
-  teams: TeamRecord[]
+  teams: Array<TeamRecord>
 }
 
 const TeamlessChild = ({ record, teams }: TeamlessChildProps) => {
@@ -225,26 +222,28 @@ const CreateTeamCard = ({ shiftNr }: { shiftNr: number }) => {
 }
 
 function RouteComponent() {
-  const shiftNr = getUserShift()
+  const shiftNr = useUser().currentShift
 
   const { data: records } = useSuspenseQuery(
     shiftRecordsFetchQueryOptions(shiftNr),
   )
   const { data: teams } = useSuspenseQuery(shiftTeamsFetchQueryOptions(shiftNr))
 
-  const teamlessCampers: CamperRecord[] = []
-  const assignedCampers = new Map<number, CamperRecord[]>()
+  const teamlessCampers: Array<CamperRecord> = []
+  const assignedCampers = new Map<number, Array<CamperRecord>>()
 
   teams.forEach((team) => {
     assignedCampers.set(team.id, [])
   })
 
-  const warningQueue: string[] = []
+  const warningQueue: Array<string> = []
 
   records.forEach((record) => {
     if (record.teamId === null) teamlessCampers.push(record)
     else {
-      const teamMembers = assignedCampers.get(record.teamId) as CamperRecord[]
+      const teamMembers = assignedCampers.get(
+        record.teamId,
+      ) as Array<CamperRecord>
       if (!teamMembers) {
         warningQueue.push(
           `${record.childName} on vale vahetuse meeskonnas. (recordRef: ${record.id})`,
@@ -256,7 +255,7 @@ function RouteComponent() {
   })
 
   teamlessCampers.sort((a, b) => a.childName.localeCompare(b.childName))
-  teams.sort((a, b) => a.name.localeCompare(b.name))
+  const sortedTeams = [...teams].sort((a, b) => a.name.localeCompare(b.name))
 
   useEffect(() => {
     warningQueue.forEach((message) => {
@@ -274,18 +273,22 @@ function RouteComponent() {
           <Separator className="my-4" />
           <div className="flex flex-wrap gap-4">
             {teamlessCampers.map((record) => (
-              <TeamlessChild key={record.id} record={record} teams={teams} />
+              <TeamlessChild
+                key={record.id}
+                record={record}
+                teams={sortedTeams}
+              />
             ))}
           </div>
         </div>
       )}
       <CreateTeamCard shiftNr={shiftNr} />
       <div className="flex flex-wrap gap-6">
-        {teams.map((team) => (
+        {sortedTeams.map((team) => (
           <TeamBox
             key={team.id}
             team={team}
-            members={assignedCampers.get(team.id) as CamperRecord[]}
+            members={assignedCampers.get(team.id) as Array<CamperRecord>}
           />
         ))}
       </div>

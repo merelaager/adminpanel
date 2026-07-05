@@ -1,22 +1,23 @@
-import { createFileRoute, Link } from '@tanstack/react-router'
+import { Link, createFileRoute } from '@tanstack/react-router'
 import {
   useMutation,
   useQueryClient,
   useSuspenseQuery,
 } from '@tanstack/react-query'
-import type { ColumnDef } from '@tanstack/table-core'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { toast } from 'sonner'
+import { SquareX } from 'lucide-react'
+import type { ColumnDef } from '@tanstack/table-core'
 
-import { getUserShift } from '@/utils.ts'
+import type { TentScore } from '@/requests/tents.ts'
+import { requireUser, useUser } from '@/stores/authStore.ts'
 
 import {
   addTentScore,
   deleteTentScore,
   shiftTentFetchQueryOptions,
-  type TentInfo,
-  type TentScore,
 } from '@/requests/tents.ts'
 import { Separator } from '@/components/ui/separator.tsx'
 import {
@@ -30,8 +31,6 @@ import {
 import { Input } from '@/components/ui/input.tsx'
 import { Button } from '@/components/ui/button.tsx'
 import { DataTable } from '@/components/data-table.tsx'
-import { toast } from 'sonner'
-import { SquareX } from 'lucide-react'
 
 export const Route = createFileRoute('/_auth/telgid/$tentNr')({
   component: RouteComponent,
@@ -39,7 +38,7 @@ export const Route = createFileRoute('/_auth/telgid/$tentNr')({
     const tentNrString = params.tentNr
     const tentNr = parseInt(tentNrString, 10)
     queryClient.ensureQueryData(
-      shiftTentFetchQueryOptions(getUserShift(), tentNr),
+      shiftTentFetchQueryOptions(requireUser().currentShift, tentNr),
     )
   },
 })
@@ -113,7 +112,7 @@ const AddGradeCard = ({ shiftNr, tentNr }: AddGradeCardProps) => {
   )
 }
 
-const scoreTableColumns: ColumnDef<TentScore>[] = [
+const scoreTableColumns: Array<ColumnDef<TentScore>> = [
   {
     accessorKey: 'createdAt',
     header: 'Kuupäev',
@@ -152,7 +151,7 @@ type DeleteScoreButtonProps = {
 
 const DeleteScoreButton = ({ scoreId, tentNr }: DeleteScoreButtonProps) => {
   const queryClient = useQueryClient()
-  const shiftNr = getUserShift()
+  const shiftNr = useUser().currentShift
 
   const mutation = useMutation({
     mutationFn: async (scoreId: number) => {
@@ -163,23 +162,15 @@ const DeleteScoreButton = ({ scoreId, tentNr }: DeleteScoreButtonProps) => {
         description: error.message,
       })
     },
-    onSuccess: async () => {
-      console.log('Success')
-
-      const staleData = queryClient.getQueryData<TentInfo>([
-        'tent',
-        shiftNr,
-        tentNr,
-      ])
-      if (!staleData) return
-
-      const index = staleData.scores.findIndex((r) => r.scoreId === scoreId)
-      if (index === -1) return
-
-      const newScores = staleData.scores.filter((r) => r.scoreId !== scoreId)
-      const updatedData = { ...staleData, scores: newScores }
-
-      queryClient.setQueryData(['tent', shiftNr, tentNr], updatedData)
+    onSuccess: () => {
+      queryClient.setQueryData(
+        shiftTentFetchQueryOptions(shiftNr, tentNr).queryKey,
+        (old) =>
+          old && {
+            ...old,
+            scores: old.scores.filter((s) => s.scoreId !== scoreId),
+          },
+      )
     },
   })
 
@@ -191,7 +182,7 @@ const DeleteScoreButton = ({ scoreId, tentNr }: DeleteScoreButtonProps) => {
 }
 
 function RouteComponent() {
-  const shiftNr = getUserShift()
+  const shiftNr = useUser().currentShift
   const tentNr = parseInt(Route.useParams().tentNr, 10)
 
   const {
@@ -199,7 +190,7 @@ function RouteComponent() {
   } = useSuspenseQuery(shiftTentFetchQueryOptions(shiftNr, tentNr))
 
   // Sort newest to oldest to prominently display more recent grades.
-  const revScores = scores.sort((a, b) =>
+  const revScores = [...scores].sort((a, b) =>
     b.createdAt.localeCompare(a.createdAt),
   )
 

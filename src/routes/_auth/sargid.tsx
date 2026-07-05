@@ -1,17 +1,19 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { registrationsQueryOptions } from '@/requests/registrations.ts'
-import { getUserShift } from '@/utils.ts'
 import { useSuspenseQuery } from '@tanstack/react-query'
+import { registrationsQueryOptions } from '@/requests/registrations.ts'
+import { requireUser, useUser } from '@/stores/authStore.ts'
 
 export const Route = createFileRoute('/_auth/sargid')({
   component: RouteComponent,
   loader: ({ context: { queryClient } }) => {
-    queryClient.ensureQueryData(registrationsQueryOptions(getUserShift()))
+    queryClient.ensureQueryData(
+      registrationsQueryOptions(requireUser().currentShift),
+    )
   },
 })
 
 function RouteComponent() {
-  const shiftNr = getUserShift()
+  const shiftNr = useUser().currentShift
 
   const { data: registrations } = useSuspenseQuery(
     registrationsQueryOptions(shiftNr),

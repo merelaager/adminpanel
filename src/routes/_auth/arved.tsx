@@ -4,21 +4,21 @@ import {
   useQueryClient,
   useSuspenseQuery,
 } from '@tanstack/react-query'
-import { type ColumnDef } from '@tanstack/table-core'
 import { toast } from 'sonner'
 
-import { getUserShift } from '@/utils.ts'
+import { ArrowUpDown } from 'lucide-react'
+import type { ColumnDef } from '@tanstack/table-core'
+import type { ChildBillData, ParentBillData } from '@/requests/billing.ts'
+import { requireUser, useUser } from '@/stores/authStore.ts'
+import { updateListItem } from '@/lib/query-cache.ts'
 
 import {
-  type ChildBillData,
   fetchBillPdf,
   generateBill,
-  type ParentBillData,
   sendBill,
   shiftBillingFetchQueryOptions,
 } from '@/requests/billing.ts'
 
-import { ArrowUpDown } from 'lucide-react'
 import { Button } from '@/components/ui/button.tsx'
 import {
   Drawer,
@@ -36,12 +36,12 @@ import { DataTable } from '@/components/data-table.tsx'
 export const Route = createFileRoute('/_auth/arved')({
   component: RouteComponent,
   loader: ({ context: { queryClient } }) => {
-    const shiftNr = getUserShift()
+    const shiftNr = requireUser().currentShift
     queryClient.ensureQueryData(shiftBillingFetchQueryOptions(shiftNr))
   },
 })
 
-const childrenTableColumns: ColumnDef<ChildBillData>[] = [
+const childrenTableColumns: Array<ColumnDef<ChildBillData>> = [
   {
     accessorKey: 'childName',
     header: 'Nimi',
@@ -68,7 +68,7 @@ const childrenTableColumns: ColumnDef<ChildBillData>[] = [
   },
 ]
 
-const billTableColumns: ColumnDef<ParentBillData>[] = [
+const billTableColumns: Array<ColumnDef<ParentBillData>> = [
   {
     accessorKey: 'name',
     header: ({ column }) => {
@@ -118,8 +118,9 @@ const billTableColumns: ColumnDef<ParentBillData>[] = [
     },
     cell: ({ row }) => {
       const billNr = row.original.billNr
-      const records = row.original.records
-      records.sort((a, b) => a.childName.localeCompare(b.childName))
+      const records = [...row.original.records].sort((a, b) =>
+        a.childName.localeCompare(b.childName),
+      )
 
       let billSent = true
       records.forEach((record) => {
@@ -201,7 +202,7 @@ const SendBillButton = ({
   billSent: boolean
 }) => {
   const queryClient = useQueryClient()
-  const shiftNr = getUserShift()
+  const shiftNr = useUser().currentShift
 
   const mutation = useMutation({
     mutationFn: async (email: string) => {
@@ -218,28 +219,15 @@ const SendBillButton = ({
         description: `Saaja: ${name} (${email})`,
       })
 
-      const staleData = queryClient.getQueryData<ParentBillData[]>([
-        'billing',
-        shiftNr,
-      ])
-      if (!staleData) return
-
-      const updatedData = [...staleData]
-      const index = updatedData.findIndex((r) => r.email === email)
-      if (index === -1) return
-
-      const staleRecords = staleData[index].records
-      const freshRecords: ChildBillData[] = []
-      staleRecords.forEach((record) => {
-        freshRecords.push({ ...record, billSent: true })
-      })
-
-      updatedData[index] = {
-        ...updatedData[index],
-        records: freshRecords,
-      }
-
-      queryClient.setQueryData(['billing', shiftNr], updatedData)
+      updateListItem<ParentBillData>(
+        queryClient,
+        shiftBillingFetchQueryOptions(shiftNr).queryKey,
+        (r) => r.email === email,
+        (r) => ({
+          ...r,
+          records: r.records.map((record) => ({ ...record, billSent: true })),
+        }),
+      )
     },
   })
 
@@ -292,17 +280,19 @@ const PrintBillButton = ({ billNr }: { billNr: number | null }) => {
 }
 
 function RouteComponent() {
-  const shiftNr = getUserShift()
+  const shiftNr = useUser().currentShift
 
   const { data: records } = useSuspenseQuery(
     shiftBillingFetchQueryOptions(shiftNr),
   )
 
-  records.sort((a, b) => a.name.localeCompare(b.name))
+  const sortedRecords = [...records].sort((a, b) =>
+    a.name.localeCompare(b.name),
+  )
 
   return (
     <div className="px-6 pb-6 flex flex-col gap-6 overflow-y-scroll h-[calc((100%-var(--spacing)*16))]">
-      <DataTable columns={billTableColumns} data={records} />
+      <DataTable columns={billTableColumns} data={sortedRecords} />
     </div>
   )
 }

@@ -2,7 +2,7 @@ import { createFileRoute } from '@tanstack/react-router'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import type { ColumnDef } from '@tanstack/table-core'
 
-import { getUserShift } from '@/utils.ts'
+import { requireUser, useUser } from '@/stores/authStore.ts'
 
 import { shiftTentsFetchQueryOptions } from '@/requests/tents.ts'
 
@@ -17,17 +17,19 @@ type DisplayTentScore = {
 export const Route = createFileRoute('/_auth/hinded')({
   component: RouteComponent,
   loader: ({ context: { queryClient } }) => {
-    queryClient.ensureQueryData(shiftTentsFetchQueryOptions(getUserShift()))
+    queryClient.ensureQueryData(
+      shiftTentsFetchQueryOptions(requireUser().currentShift),
+    )
   },
 })
 
-const scoreColumns: ColumnDef<DisplayTentScore[]>[] = [
+const scoreColumns: Array<ColumnDef<Array<DisplayTentScore>>> = [
   1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
 ].map((tentNr) => {
   return {
     header: `${tentNr}`,
     cell: ({ row }) => {
-      let relevantEntry = Array.from(row.original.values()).find(
+      const relevantEntry = Array.from(row.original.values()).find(
         (e) => e.tentNr === tentNr,
       )
       if (relevantEntry) return relevantEntry.score.toFixed(1)
@@ -36,7 +38,7 @@ const scoreColumns: ColumnDef<DisplayTentScore[]>[] = [
   }
 })
 
-const scoreTableColumns: ColumnDef<DisplayTentScore[]>[] = [
+const scoreTableColumns: Array<ColumnDef<Array<DisplayTentScore>>> = [
   {
     header: 'Kuupäev',
     cell: ({ row }) => {
@@ -47,13 +49,13 @@ const scoreTableColumns: ColumnDef<DisplayTentScore[]>[] = [
 ]
 
 function RouteComponent() {
-  const shiftNr = getUserShift()
+  const shiftNr = useUser().currentShift
 
   const { data: scores } = useSuspenseQuery(
     shiftTentsFetchQueryOptions(shiftNr),
   )
 
-  const dateScores = new Map<string, DisplayTentScore[]>()
+  const dateScores = new Map<string, Array<DisplayTentScore>>()
 
   // Split scores by date.
   scores.forEach((score) => {
@@ -66,19 +68,19 @@ function RouteComponent() {
     entries.push(score)
   })
 
-  const summedScores: number[] = []
+  const summedScores: Array<number> = []
   for (let i = 1; i <= 10; ++i) summedScores.push(0)
 
   // Keep only a single score per tent per calendar day.
   // Average multiple values for the same day.
-  const uniqueDateScores = new Map<string, DisplayTentScore[]>()
+  const uniqueDateScores = new Map<string, Array<DisplayTentScore>>()
   dateScores.forEach((tentInfo, dateString) => {
     if (tentInfo.length === 0) {
       uniqueDateScores.set(dateString, [])
       return
     }
 
-    const dateScores: DisplayTentScore[] = []
+    const dateScores: Array<DisplayTentScore> = []
     for (let i = 1; i <= 10; ++i) {
       let totalCount = 0
       let totalScore = 0
@@ -105,7 +107,7 @@ function RouteComponent() {
     uniqueDateScores.set(dateString, dateScores)
   })
 
-  const averages: DisplayTentScore[] = []
+  const averages: Array<DisplayTentScore> = []
   for (let i = 0; i < 10; ++i) {
     averages.push({
       score: summedScores[i] / uniqueDateScores.size,

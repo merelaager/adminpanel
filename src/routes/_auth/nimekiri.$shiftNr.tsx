@@ -8,8 +8,8 @@ import {
 import {
   BadgeEuroIcon,
   ChevronDownIcon,
-  ChevronsUpDownIcon,
   ChevronUpIcon,
+  ChevronsUpDownIcon,
   ListFilterIcon,
   MailCheckIcon,
   MarsIcon,
@@ -18,7 +18,26 @@ import {
 } from 'lucide-react'
 import { toast } from 'sonner'
 
-import { useAuthStore, type User } from '@/stores/authStore.ts'
+import {
+  getCoreRowModel,
+  getFilteredRowModel,
+  getSortedRowModel,
+} from '@tanstack/table-core'
+import { flexRender, useReactTable } from '@tanstack/react-table'
+import type {
+  Column,
+  ColumnDef,
+  ColumnFiltersState,
+  RowData,
+  SortingState,
+  VisibilityState,
+} from '@tanstack/table-core'
+import type {
+  PatchKeys,
+  PatchObject,
+  RegistrationEntry,
+} from '@/requests/registrations.ts'
+import { useUser } from '@/stores/authStore.ts'
 
 import { Button } from '@/components/ui/button.tsx'
 import { Switch } from '@/components/ui/switch.tsx'
@@ -44,19 +63,6 @@ import { ChildRecordsSheet } from '@/components/ChildRecordsSheet.tsx'
 import { ShiftNav } from '@/components/ShiftMenu.tsx'
 
 import {
-  type Column,
-  type ColumnDef,
-  type ColumnFiltersState,
-  getCoreRowModel,
-  getFilteredRowModel,
-  getSortedRowModel,
-  type RowData,
-  type SortingState,
-  type VisibilityState,
-} from '@tanstack/table-core'
-import { flexRender, useReactTable } from '@tanstack/react-table'
-
-import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
@@ -64,14 +70,12 @@ import {
 } from '@/components/ui/dropdown-menu.tsx'
 
 import {
-  fetchShiftPdf,
-  type PatchKeys,
-  type PatchObject,
-  patchRegistrations,
-  type RegistrationEntry,
-  registrationsQueryOptions,
   Sex,
+  fetchShiftPdf,
+  patchRegistrations,
+  registrationsQueryOptions,
 } from '@/requests/registrations.ts'
+import { updateListItem } from '@/lib/query-cache.ts'
 
 export const Route = createFileRoute('/_auth/nimekiri/$shiftNr')({
   component: RouteComponent,
@@ -85,7 +89,8 @@ export const Route = createFileRoute('/_auth/nimekiri/$shiftNr')({
 
 type RegistrationDataTableProps = {
   title: string
-  registrations: RegistrationEntry[]
+  registrations: Array<RegistrationEntry>
+  shiftNr: number
   isDetailView: boolean
   isPriceEditable: boolean
   showSearch?: boolean
@@ -101,7 +106,6 @@ type RegistrationMutation = {
 // Recreating them on every render would give each cell a new component identity
 // and remount its subtree, tearing down Radix tooltips before they can open.
 declare module '@tanstack/table-core' {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   interface TableMeta<TData extends RowData> {
     isDetailView: boolean
     isPriceEditable: boolean
@@ -119,7 +123,7 @@ const SexFilterHeader = ({
 }: {
   column: Column<RegistrationEntry, unknown>
 }) => {
-  const selected = column.getFilterValue() as Sex[] | undefined
+  const selected = column.getFilterValue() as Array<Sex> | undefined
 
   const isChecked = (sex: Sex) =>
     selected === undefined ? true : selected.includes(sex)
@@ -164,7 +168,7 @@ const SexFilterHeader = ({
   )
 }
 
-const registrationColumns: ColumnDef<RegistrationEntry>[] = [
+const registrationColumns: Array<ColumnDef<RegistrationEntry>> = [
   {
     id: 'name',
     accessorKey: 'child.name',
@@ -292,7 +296,7 @@ const registrationColumns: ColumnDef<RegistrationEntry>[] = [
     accessorKey: 'child.sex',
     header: ({ column }) => <SexFilterHeader column={column} />,
     enableSorting: false,
-    filterFn: (row, columnId, filterValue: Sex[]) =>
+    filterFn: (row, columnId, filterValue: Array<Sex>) =>
       filterValue.includes(row.getValue(columnId)),
     cell: ({ row }) =>
       row.original.child.sex === Sex.M ? (
@@ -318,34 +322,23 @@ const registrationColumns: ColumnDef<RegistrationEntry>[] = [
 export const RegistrationDataTable = ({
   title,
   registrations,
+  shiftNr,
   isDetailView,
   isPriceEditable,
   showSearch = false,
 }: RegistrationDataTableProps) => {
   const queryClient = useQueryClient()
 
-  const shiftNr = registrations[0]?.shiftNr
-
   const mutation = useMutation({
     mutationFn: (newState: RegistrationMutation) =>
       patchRegistrations(newState.regId, newState.patch),
     onSuccess: (_, newState) => {
-      const staleData = queryClient.getQueryData<RegistrationEntry[]>([
-        'registrations',
-        shiftNr,
-      ])
-      if (!staleData) return
-
-      const updatedData = [...staleData]
-      const index = updatedData.findIndex((r) => r.id === newState.regId)
-      if (index === -1) return
-
-      updatedData[index] = {
-        ...updatedData[index],
-        ...newState.patch,
-      }
-
-      queryClient.setQueryData(['registrations', shiftNr], updatedData)
+      updateListItem<RegistrationEntry>(
+        queryClient,
+        registrationsQueryOptions(shiftNr).queryKey,
+        (r) => r.id === newState.regId,
+        (r) => ({ ...r, ...newState.patch }),
+      )
     },
     onError: (error) => {
       toast.error('Viga andmete uuendamisel!', {
@@ -506,7 +499,7 @@ function RouteComponent() {
   const { regCategories, registeredCampers, reserveCampers } =
     React.useMemo(() => {
       const categories: {
-        [key: string]: { [key in Sex]: RegistrationEntry[] }
+        [key: string]: { [key in Sex]: Array<RegistrationEntry> }
       } = {
         reg: { M: [], F: [] },
         res: { M: [], F: [] },
@@ -557,7 +550,7 @@ function RouteComponent() {
     registrations.length > 0 &&
     registrations[0].birthday !== undefined &&
     registrations[0].contactEmail !== undefined
-  const displayPriceEditSwitch = (useAuthStore.getState().user as User).isRoot
+  const displayPriceEditSwitch = useUser().isRoot
 
   return (
     <div className="pb-6 overflow-y-scroll h-[calc((100%-var(--spacing)*16))]">
@@ -596,6 +589,7 @@ function RouteComponent() {
       <RegistrationDataTable
         title="Põhinimekiri"
         registrations={registeredCampers}
+        shiftNr={shiftNr}
         isDetailView={isDetailView}
         isPriceEditable={isPriceEditable}
         showSearch
@@ -603,6 +597,7 @@ function RouteComponent() {
       <RegistrationDataTable
         title="Reserv"
         registrations={reserveCampers}
+        shiftNr={shiftNr}
         isDetailView={isDetailView}
         isPriceEditable={isPriceEditable}
       />

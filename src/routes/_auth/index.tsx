@@ -1,19 +1,20 @@
-import { createFileRoute, Link } from '@tanstack/react-router'
+import { Link, createFileRoute } from '@tanstack/react-router'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 
-import { getCurrentRole, getUserShift } from '@/utils.ts'
-
-import {
-  shiftStaffFetchQueryOptions,
-  type ShiftStaffMember,
-  type StaffCertificate,
-} from '@/requests/shift-staff.ts'
 import { useSuspenseQuery } from '@tanstack/react-query'
+import { CircleAlertIcon } from 'lucide-react'
+import { toast } from 'sonner'
+import type {
+  ShiftStaffMember,
+  StaffCertificate,
+} from '@/requests/shift-staff.ts'
+import { requireUser, useUser } from '@/stores/authStore.ts'
+
+import { shiftStaffFetchQueryOptions } from '@/requests/shift-staff.ts'
 import { Separator } from '@/components/ui/separator.tsx'
 import { Badge } from '@/components/ui/badge.tsx'
-import { CircleAlertIcon } from 'lucide-react'
 import {
   Tooltip,
   TooltipContent,
@@ -37,12 +38,11 @@ import {
   SelectValue,
 } from '@/components/ui/select.tsx'
 import { changePassword, sendInvite } from '@/requests/user.ts'
-import { toast } from 'sonner'
 
 export const Route = createFileRoute('/_auth/')({
   component: App,
   loader: ({ context: { queryClient } }) => {
-    const shiftNr = getUserShift()
+    const shiftNr = requireUser().currentShift
     queryClient.ensureQueryData(shiftStaffFetchQueryOptions(shiftNr))
   },
 })
@@ -63,7 +63,7 @@ const MissingCertificateTooltip = () => {
 }
 
 type ActiveCertificatesProps = {
-  certificates: StaffCertificate[]
+  certificates: Array<StaffCertificate>
 }
 
 const ActiveCertificates = ({ certificates }: ActiveCertificatesProps) => {
@@ -128,7 +128,7 @@ const TeamCardEntry = ({ member }: TeamCardEntryProps) => {
 }
 
 type TeamCardProps = {
-  staff: ShiftStaffMember[]
+  staff: Array<ShiftStaffMember>
 }
 
 const TeamCard = ({ staff }: TeamCardProps) => {
@@ -256,7 +256,7 @@ const ChangePasswordCard = () => {
 }
 
 const InviteCard = () => {
-  const shiftNr = getUserShift()
+  const shiftNr = useUser().currentShift
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -356,8 +356,9 @@ const InviteCard = () => {
 }
 
 function App() {
-  const shiftNr = getUserShift()
-  const currentRole = getCurrentRole()
+  const user = useUser()
+  const shiftNr = user.currentShift
+  const currentRole = user.currentRole
 
   const canInvite = ['root', 'boss'].includes(currentRole)
 

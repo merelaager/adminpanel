@@ -1,18 +1,16 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { getUserShift } from '@/utils.ts'
 import { useSuspenseQuery } from '@tanstack/react-query'
-import {
-  type CamperRecord,
-  shiftRecordsFetchQueryOptions,
-} from '@/requests/shift-records.ts'
 import { useTimer } from 'react-timer-hook'
 import { useCallback, useEffect, useMemo, useState } from 'react'
+import type { CamperRecord } from '@/requests/shift-records.ts'
+import { shiftRecordsFetchQueryOptions } from '@/requests/shift-records.ts'
+import { requireUser, useUser } from '@/stores/authStore.ts'
 import { Button } from '@/components/ui/button.tsx'
 
 export const Route = createFileRoute('/_auth/taimer')({
   component: RouteComponent,
   loader: ({ context: { queryClient } }) => {
-    const shiftNr = getUserShift()
+    const shiftNr = requireUser().currentShift
     queryClient.ensureQueryData(shiftRecordsFetchQueryOptions(shiftNr))
   },
 })
@@ -102,13 +100,13 @@ const ChildTimerEntry = ({
 }
 
 function RouteComponent() {
-  const shiftNr = getUserShift()
+  const shiftNr = useUser().currentShift
 
   const { data: records } = useSuspenseQuery(
     shiftRecordsFetchQueryOptions(shiftNr),
   )
 
-  const [recentStarts, setRecentStarts] = useState<number[]>([])
+  const [recentStarts, setRecentStarts] = useState<Array<number>>([])
 
   const sortedRecords = useMemo(() => {
     const baseList = [...records].sort((a, b) =>

@@ -54,3 +54,27 @@ export const useAuthStore = create<AuthState & UpdateAction>((set) => ({
     })
   },
 }))
+
+/**
+ * Reactive access to the authenticated user. Only call from components
+ * rendered under the `_auth` layout, where a user is guaranteed.
+ */
+export const useUser = (): User => {
+  const user = useAuthStore((state) => state.user)
+  if (!user) {
+    throw new Error('useUser called without an authenticated user')
+  }
+  return user
+}
+
+/**
+ * Non-reactive user access for router loaders and beforeLoad hooks.
+ * Do not call from component render code — it does not subscribe to updates.
+ */
+export const requireUser = (): User => {
+  const user = useAuthStore.getState().user
+  if (!user) {
+    throw new Error('requireUser called without an authenticated user')
+  }
+  return user
+}

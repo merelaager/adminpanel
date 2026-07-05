@@ -5279,31 +5279,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"jotai-tanstack-query@npm:^0.9.0":
-  version: 0.9.0
-  resolution: "jotai-tanstack-query@npm:0.9.0"
-  peerDependencies:
-    "@tanstack/query-core": "*"
-    jotai: ">=2.0.0"
-  checksum: 10c0/5bacdf976947b219f75c9de00eebbc8b8dd4ff949f386cf8ca16d0c581d743d1280979d5ff19e4f95ea63cef8a19c1c4276ae012c8b59febec6800107583d46a
-  languageName: node
-  linkType: hard
-
-"jotai@npm:^2.12.5":
-  version: 2.12.5
-  resolution: "jotai@npm:2.12.5"
-  peerDependencies:
-    "@types/react": ">=17.0.0"
-    react: ">=17.0.0"
-  peerDependenciesMeta:
-    "@types/react":
-      optional: true
-    react:
-      optional: true
-  checksum: 10c0/5075b2c78f3e170d84a14b9f69a5903a5aa5b61242ee9acebc5665ce5a5fb13724748107dfd1069d00fe45b3a4ed15e07c40c0861dc817effc10532b733afabe
-  languageName: node
-  linkType: hard
-
 "js-levenshtein@npm:1.1.6":
   version: 1.1.6
   resolution: "js-levenshtein@npm:1.1.6"
@@ -5774,8 +5749,6 @@ __metadata:
     class-variance-authority: "npm:^0.7.1"
     clsx: "npm:^2.1.1"
     eslint: "npm:^9.39.4"
-    jotai: "npm:^2.12.5"
-    jotai-tanstack-query: "npm:^0.9.0"
     jsdom: "npm:^26.0.0"
     lucide-react: "npm:^0.522.0"
     next-themes: "npm:^0.4.6"

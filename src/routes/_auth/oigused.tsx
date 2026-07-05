@@ -1,21 +1,17 @@
 import * as React from 'react'
 import { createFileRoute, useRouter } from '@tanstack/react-router'
 import { useSuspenseQuery } from '@tanstack/react-query'
-import {
-  type ColumnDef,
-  getCoreRowModel,
-  getSortedRowModel,
-  type SortingState,
-} from '@tanstack/table-core'
+import { getCoreRowModel, getSortedRowModel } from '@tanstack/table-core'
 import { flexRender, useReactTable } from '@tanstack/react-table'
-
-import { useAuthStore, type User } from '@/stores/authStore.ts'
 
 import { ArrowUpDown } from 'lucide-react'
 import { toast } from 'sonner'
+import { Route as homeRoute } from './index.tsx'
+import type { ColumnDef, SortingState } from '@tanstack/table-core'
+import type { ShiftUser } from '@/requests/shift-users.ts'
 import { Button } from '@/components/ui/button.tsx'
 
-import { Route as homeRoute } from './index.tsx'
+import { requireUser, useUser } from '@/stores/authStore.ts'
 
 import {
   Table,
@@ -26,23 +22,18 @@ import {
   TableRow,
 } from '@/components/ui/table.tsx'
 
-import {
-  type ShiftUser,
-  shiftUsersFetchQueryOptions,
-} from '@/requests/shift-users.ts'
+import { shiftUsersFetchQueryOptions } from '@/requests/shift-users.ts'
 
 export const Route = createFileRoute('/_auth/oigused')({
   component: RouteComponent,
   errorComponent: ErrorComponent,
   loader: ({ context: { queryClient } }) => {
-    // The route is authenticated so we know that the info is available.
-    const user = useAuthStore.getState().user as User
-    const shiftNr = user.currentShift
+    const shiftNr = requireUser().currentShift
     queryClient.ensureQueryData(shiftUsersFetchQueryOptions(shiftNr))
   },
 })
 
-const columns: ColumnDef<ShiftUser>[] = [
+const columns: Array<ColumnDef<ShiftUser>> = [
   {
     accessorKey: 'name',
     header: ({ column }) => {
@@ -74,8 +65,8 @@ const columns: ColumnDef<ShiftUser>[] = [
 ]
 
 interface DataTableProps<TData, TValue> {
-  columns: ColumnDef<TData, TValue>[]
-  data: TData[]
+  columns: Array<ColumnDef<TData, TValue>>
+  data: Array<TData>
 }
 
 function DataTable<TData, TValue>({
@@ -151,11 +142,10 @@ function ErrorComponent({ error }: { error: Error }) {
 }
 
 function RouteComponent() {
-  const user = useAuthStore.getState().user as User
-  const shiftNr = user.currentShift
+  const shiftNr = useUser().currentShift
 
   const { data: users } = useSuspenseQuery(shiftUsersFetchQueryOptions(shiftNr))
-  const sortedUsers = users.sort((a, b) => a.name.localeCompare(b.name))
+  const sortedUsers = [...users].sort((a, b) => a.name.localeCompare(b.name))
 
   return (
     <div className="mx-6">

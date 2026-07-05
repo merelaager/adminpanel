@@ -2,20 +2,20 @@ import * as React from 'react'
 import { createFileRoute } from '@tanstack/react-router'
 import { useSuspenseQueries } from '@tanstack/react-query'
 
-import { getUserShift } from '@/utils.ts'
+import { requireUser, useUser } from '@/stores/authStore.ts'
 import { registrationsQueryOptions } from '@/requests/registrations.ts'
 import { Button } from '@/components/ui/button.tsx'
 
 export const Route = createFileRoute('/_auth/meilid')({
   component: RouteComponent,
   loader: ({ context: { queryClient } }) => {
-    const shiftNr = getUserShift()
+    const shiftNr = requireUser().currentShift
     return queryClient.ensureQueryData(registrationsQueryOptions(shiftNr))
   },
 })
 
 function RouteComponent() {
-  const shiftNr = getUserShift()
+  const shiftNr = useUser().currentShift
 
   const results = useSuspenseQueries({
     queries: [registrationsQueryOptions(shiftNr)],

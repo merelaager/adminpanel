@@ -2,7 +2,7 @@ import { createFileRoute, redirect } from '@tanstack/react-router'
 
 import { Route as registrationRoute } from './nimekiri.$shiftNr.tsx'
 
-import { useAuthStore, type User } from '@/stores/authStore.ts'
+import { requireUser } from '@/stores/authStore.ts'
 
 export const Route = createFileRoute('/_auth/nimekiri')({
   loader: () => {
@@ -16,11 +16,9 @@ export const Route = createFileRoute('/_auth/nimekiri')({
     )
     if (!shouldRedirect) return
 
-    // This is a protected route so we know that the user exists.
-    const user = useAuthStore.getState().user as User
     throw redirect({
       to: registrationRoute.to,
-      params: { shiftNr: `${user.currentShift}` },
+      params: { shiftNr: `${requireUser().currentShift}` },
     })
   },
 })
