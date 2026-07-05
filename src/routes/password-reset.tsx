@@ -4,12 +4,6 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { toast } from 'sonner'
 import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card.tsx'
-import {
   Form,
   FormControl,
   FormField,
@@ -19,7 +13,7 @@ import {
 } from '@/components/ui/form.tsx'
 import { Input } from '@/components/ui/input.tsx'
 import { Button } from '@/components/ui/button.tsx'
-import { Logo } from '@/components/Logo.tsx'
+import { AuthCard } from '@/components/AuthCard.tsx'
 import { Route as loginRoute } from '@/routes/login.tsx'
 import { resetPassword } from '@/requests/password-reset.ts'
 
@@ -79,68 +73,56 @@ function RouteComponent() {
   }
 
   return (
-    <div className="w-full flex items-center h-auto sm:items-start top-1/4 relative">
-      <div className="px-6 w-full max-w-sm mx-auto">
-        <Card>
-          <CardHeader className="text-center">
-            <div className="w-[50px] mx-auto">
-              <Logo />
-            </div>
-            <CardTitle>Lähtesta salasõna</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Form {...form}>
-              <form
-                className="flex flex-col gap-4"
-                onSubmit={form.handleSubmit(onFormSubmit)}
-              >
-                <FormField
-                  control={form.control}
-                  name="password"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Salasõna</FormLabel>
-                      <FormControl>
-                        <Input {...field} type="password" />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="passwordConfirmation"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Salasõna uuesti</FormLabel>
-                      <FormControl>
-                        <Input {...field} type="password" />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="token"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Pääsmik</FormLabel>
-                      <FormControl>
-                        <Input {...field} disabled={!!token} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <Button type="submit" disabled={!passwordsMatch}>
-                  Lähtesta salasõna
-                </Button>
-              </form>
-            </Form>
-          </CardContent>
-        </Card>
-      </div>
-    </div>
+    <AuthCard title="Lähtesta salasõna">
+      <Form {...form}>
+        <form
+          className="flex flex-col gap-4"
+          onSubmit={form.handleSubmit(onFormSubmit)}
+        >
+          <FormField
+            control={form.control}
+            name="password"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Salasõna</FormLabel>
+                <FormControl>
+                  <Input {...field} type="password" />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="passwordConfirmation"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Salasõna uuesti</FormLabel>
+                <FormControl>
+                  <Input {...field} type="password" />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="token"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Pääsmik</FormLabel>
+                <FormControl>
+                  <Input {...field} disabled={!!token} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <Button type="submit" disabled={!passwordsMatch}>
+            Lähtesta salasõna
+          </Button>
+        </form>
+      </Form>
+    </AuthCard>
   )
 }

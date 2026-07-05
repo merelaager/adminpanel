@@ -6,12 +6,6 @@ import { useAuthStore } from '@/stores/authStore.ts'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card.tsx'
 import { zodResolver } from '@hookform/resolvers/zod'
 import {
   Form,
@@ -31,7 +25,7 @@ import {
 } from '@/components/ui/alert-dialog.tsx'
 import { Input } from '@/components/ui/input.tsx'
 import { Button } from '@/components/ui/button.tsx'
-import { Logo } from '@/components/Logo.tsx'
+import { AuthCard } from '@/components/AuthCard.tsx'
 
 import { Route as homeRoute } from './_auth/index.tsx'
 import { submitPasswordResetRequest } from '@/requests/password-reset.ts'
@@ -180,56 +174,44 @@ function LoginComponent() {
   }
 
   return (
-    <div className="w-full flex items-center h-auto sm:items-start top-1/4 relative">
-      <div className="px-6 w-full max-w-sm mx-auto">
-        <Card>
-          <CardHeader className="text-center">
-            <div className="w-[50px] mx-auto">
-              <Logo />
-            </div>
-            <CardTitle>Kambüüs</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Form {...form}>
-              <form
-                className="flex flex-col gap-4"
-                onSubmit={form.handleSubmit(onFormSubmit)}
-              >
-                <FormField
-                  control={form.control}
-                  name="username"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Kasutajanimi</FormLabel>
-                      <FormControl>
-                        <Input {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="password"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Salasõna</FormLabel>
-                      <FormControl>
-                        <Input {...field} type="password" />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <Button type="submit">Logi sisse</Button>
-              </form>
-            </Form>
-            <div className="pt-4">
-              <PasswordReset />
-            </div>
-          </CardContent>
-        </Card>
+    <AuthCard title="Kambüüs">
+      <Form {...form}>
+        <form
+          className="flex flex-col gap-4"
+          onSubmit={form.handleSubmit(onFormSubmit)}
+        >
+          <FormField
+            control={form.control}
+            name="username"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Kasutajanimi</FormLabel>
+                <FormControl>
+                  <Input {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="password"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Salasõna</FormLabel>
+                <FormControl>
+                  <Input {...field} type="password" />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <Button type="submit">Logi sisse</Button>
+        </form>
+      </Form>
+      <div className="pt-4">
+        <PasswordReset />
       </div>
-    </div>
+    </AuthCard>
   )
 }

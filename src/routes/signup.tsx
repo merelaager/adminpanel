@@ -7,12 +7,6 @@ import { type SignupBody, signupUser } from '@/requests/user.ts'
 
 import { toast } from 'sonner'
 import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card.tsx'
-import {
   Form,
   FormControl,
   FormField,
@@ -22,7 +16,7 @@ import {
 } from '@/components/ui/form.tsx'
 import { Input } from '@/components/ui/input.tsx'
 import { Button } from '@/components/ui/button.tsx'
-import { Logo } from '@/components/Logo.tsx'
+import { AuthCard } from '@/components/AuthCard.tsx'
 
 import { Route as loginRoute } from '@/routes/login.tsx'
 
@@ -96,108 +90,93 @@ function RouteComponent() {
   }
 
   return (
-    <div className="w-full flex items-center h-auto sm:items-start top-1/4 relative">
-      <div className="px-6 w-full max-w-sm mx-auto">
-        <Card>
-          <CardHeader className="text-center">
-            <div className="w-[50px] mx-auto">
-              <Logo />
-            </div>
-            <CardTitle>Loo kambüüsi konto</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Form {...form}>
-              <form
-                className="flex flex-col gap-4"
-                onSubmit={form.handleSubmit(onFormSubmit)}
-              >
-                <FormField
-                  control={form.control}
-                  name="username"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Kasutajanimi</FormLabel>
-                      <FormControl>
-                        <Input {...field} placeholder="kotermann" />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="email"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Meiliaadress</FormLabel>
-                      <FormControl>
-                        <Input
-                          {...field}
-                          placeholder="kotermann@merelaager.ee"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="name"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Nimi</FormLabel>
-                      <FormControl>
-                        <Input {...field} placeholder="Kotermann Haldjas" />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="nickname"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Hüüdnimi (valikuline)</FormLabel>
-                      <FormControl>
-                        <Input {...field} placeholder="Poterman" />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="password"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Salasõna</FormLabel>
-                      <FormControl>
-                        <Input {...field} type="password" />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="token"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Pääsmik</FormLabel>
-                      <FormControl>
-                        <Input {...field} disabled={!!token} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <Button type="submit">Loo konto</Button>
-              </form>
-            </Form>
-          </CardContent>
-        </Card>
-      </div>
-    </div>
+    <AuthCard title="Loo kambüüsi konto">
+      <Form {...form}>
+        <form
+          className="flex flex-col gap-4"
+          onSubmit={form.handleSubmit(onFormSubmit)}
+        >
+          <FormField
+            control={form.control}
+            name="username"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Kasutajanimi</FormLabel>
+                <FormControl>
+                  <Input {...field} placeholder="kotermann" />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="email"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Meiliaadress</FormLabel>
+                <FormControl>
+                  <Input {...field} placeholder="kotermann@merelaager.ee" />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="name"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Nimi</FormLabel>
+                <FormControl>
+                  <Input {...field} placeholder="Kotermann Haldjas" />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="nickname"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Hüüdnimi (valikuline)</FormLabel>
+                <FormControl>
+                  <Input {...field} placeholder="Poterman" />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="password"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Salasõna</FormLabel>
+                <FormControl>
+                  <Input {...field} type="password" />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="token"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Pääsmik</FormLabel>
+                <FormControl>
+                  <Input {...field} disabled={!!token} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <Button type="submit">Loo konto</Button>
+        </form>
+      </Form>
+    </AuthCard>
   )
 }
