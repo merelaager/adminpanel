@@ -8,7 +8,7 @@ export const Route = createFileRoute('/_auth/sargid')({
   component: RouteComponent,
   beforeLoad: requireAdmin,
   loader: ({ context: { queryClient } }) => {
-    queryClient.ensureQueryData(
+    return queryClient.ensureQueryData(
       registrationsQueryOptions(requireUser().currentShift),
     )
   },

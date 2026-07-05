@@ -28,7 +28,7 @@ export const Route = createFileRoute('/_auth/oigused')({
   beforeLoad: requireAdmin,
   loader: ({ context: { queryClient } }) => {
     const shiftNr = requireUser().currentShift
-    queryClient.ensureQueryData(shiftUsersFetchQueryOptions(shiftNr))
+    return queryClient.ensureQueryData(shiftUsersFetchQueryOptions(shiftNr))
   },
 })
 

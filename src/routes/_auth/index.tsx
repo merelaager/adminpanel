@@ -44,7 +44,7 @@ export const Route = createFileRoute('/_auth/')({
   component: App,
   loader: ({ context: { queryClient } }) => {
     const shiftNr = requireUser().currentShift
-    queryClient.ensureQueryData(shiftStaffFetchQueryOptions(shiftNr))
+    return queryClient.ensureQueryData(shiftStaffFetchQueryOptions(shiftNr))
   },
 })
 

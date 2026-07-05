@@ -84,7 +84,7 @@ export const Route = createFileRoute('/_auth/nimekiri/$shiftNr')({
     // TODO: check the shiftNr and redirect to selected shift, if invalid.
     const shiftNrString = params.shiftNr
     const shiftNr = parseInt(shiftNrString, 10)
-    queryClient.ensureQueryData(registrationsQueryOptions(shiftNr))
+    return queryClient.ensureQueryData(registrationsQueryOptions(shiftNr))
   },
 })
 

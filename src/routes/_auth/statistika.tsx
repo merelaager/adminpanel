@@ -27,7 +27,7 @@ export const Route = createFileRoute('/_auth/statistika')({
   component: RouteComponent,
   loader: ({ context: { queryClient } }) => {
     const shiftNr = requireUser().currentShift
-    queryClient.ensureQueryData(shiftRecordsFetchQueryOptions(shiftNr))
+    return queryClient.ensureQueryData(shiftRecordsFetchQueryOptions(shiftNr))
   },
 })
 

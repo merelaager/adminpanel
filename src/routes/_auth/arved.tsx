@@ -40,7 +40,7 @@ export const Route = createFileRoute('/_auth/arved')({
   beforeLoad: requireAdmin,
   loader: ({ context: { queryClient } }) => {
     const shiftNr = requireUser().currentShift
-    queryClient.ensureQueryData(shiftBillingFetchQueryOptions(shiftNr))
+    return queryClient.ensureQueryData(shiftBillingFetchQueryOptions(shiftNr))
   },
 })
 

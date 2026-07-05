@@ -52,8 +52,10 @@ export const Route = createFileRoute('/_auth/meeskonnad')({
   component: RouteComponent,
   loader: ({ context: { queryClient } }) => {
     const shiftNr = requireUser().currentShift
-    queryClient.ensureQueryData(shiftRecordsFetchQueryOptions(shiftNr))
-    queryClient.ensureQueryData(shiftTeamsFetchQueryOptions(shiftNr))
+    return Promise.all([
+      queryClient.ensureQueryData(shiftRecordsFetchQueryOptions(shiftNr)),
+      queryClient.ensureQueryData(shiftTeamsFetchQueryOptions(shiftNr)),
+    ])
   },
 })
 

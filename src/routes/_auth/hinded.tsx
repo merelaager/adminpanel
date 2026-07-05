@@ -17,7 +17,7 @@ type DisplayTentScore = {
 export const Route = createFileRoute('/_auth/hinded')({
   component: RouteComponent,
   loader: ({ context: { queryClient } }) => {
-    queryClient.ensureQueryData(
+    return queryClient.ensureQueryData(
       shiftTentsFetchQueryOptions(requireUser().currentShift),
     )
   },

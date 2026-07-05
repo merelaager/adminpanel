@@ -37,7 +37,7 @@ export const Route = createFileRoute('/_auth/telgid/$tentNr')({
   loader: ({ context: { queryClient }, params }) => {
     const tentNrString = params.tentNr
     const tentNr = parseInt(tentNrString, 10)
-    queryClient.ensureQueryData(
+    return queryClient.ensureQueryData(
       shiftTentFetchQueryOptions(requireUser().currentShift, tentNr),
     )
   },
