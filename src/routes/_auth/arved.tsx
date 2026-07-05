@@ -12,6 +12,7 @@ import type { ChildBillData, ParentBillData } from '@/requests/billing.ts'
 import { requireUser, useUser } from '@/stores/authStore.ts'
 import { updateListItem } from '@/lib/query-cache.ts'
 import { requireAdmin } from '@/lib/roles.ts'
+import { openBlobInNewTab } from '@/lib/blob.ts'
 
 import {
   fetchBillPdf,
@@ -259,14 +260,7 @@ const PrintBillButton = ({ billNr }: { billNr: number | null }) => {
       return
     }
 
-    const obj = {
-      filename: `arve-${billNr}.pdf`,
-      blob: pdfBlob,
-    }
-
-    const newBlob = new Blob([obj.blob], { type: 'application/pdf' })
-    const objUrl = window.URL.createObjectURL(newBlob)
-    window.open(objUrl, '_blank')
+    openBlobInNewTab(pdfBlob)
   }
 
   return (

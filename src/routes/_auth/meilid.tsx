@@ -5,6 +5,7 @@ import { requireUser, useUser } from '@/stores/authStore.ts'
 import { shiftEmailsQueryOptions } from '@/requests/shift-emails.ts'
 import { Button } from '@/components/ui/button.tsx'
 import { requireAdmin } from '@/lib/roles.ts'
+import { downloadBlob } from '@/lib/blob.ts'
 
 export const Route = createFileRoute('/_auth/meilid')({
   component: RouteComponent,
@@ -25,13 +26,7 @@ function RouteComponent() {
   const download = () => {
     const date = new Date().toISOString().slice(0, 10).replace(/-/g, '')
     const filename = `${shiftNr}v-meilid-${date}.txt`
-    const blob = new Blob([emails.join('\n')], { type: 'text/plain' })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = filename
-    a.click()
-    URL.revokeObjectURL(url)
+    downloadBlob(new Blob([emails.join('\n')], { type: 'text/plain' }), filename)
   }
 
   return (

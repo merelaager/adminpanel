@@ -76,6 +76,7 @@ import {
   registrationsQueryOptions,
 } from '@/requests/registrations.ts'
 import { updateListItem } from '@/lib/query-cache.ts'
+import { openBlobInNewTab } from '@/lib/blob.ts'
 
 export const Route = createFileRoute('/_auth/nimekiri/$shiftNr')({
   component: RouteComponent,
@@ -534,16 +535,16 @@ function RouteComponent() {
   }
 
   const print = async () => {
-    const pdfBlob = await fetchShiftPdf(shiftNr)
-
-    const obj = {
-      filename: `${shiftNr}v_nimekiri.pdf`,
-      blob: pdfBlob,
+    let pdfBlob: Blob
+    try {
+      pdfBlob = await fetchShiftPdf(shiftNr)
+    } catch (err) {
+      toast.warning('Viga nimekirja pärimisel!', {
+        description: (err as Error).message,
+      })
+      return
     }
-
-    const newBlob = new Blob([obj.blob], { type: 'application/pdf' })
-    const objUrl = window.URL.createObjectURL(newBlob)
-    window.open(objUrl, '_blank')
+    openBlobInNewTab(pdfBlob)
   }
 
   const displayPrintButton =
