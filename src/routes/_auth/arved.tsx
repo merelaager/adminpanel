@@ -254,8 +254,10 @@ const SendBillButton = ({
   )
 }
 
-const PrintBillButton = ({ billNr }: { billNr: number }) => {
+const PrintBillButton = ({ billNr }: { billNr: number | null }) => {
   const print = async () => {
+    if (billNr === null) return
+
     let pdfBlob: Blob
 
     try {
@@ -281,7 +283,7 @@ const PrintBillButton = ({ billNr }: { billNr: number }) => {
     <Button
       variant="outline"
       className="mr-2"
-      disabled={billNr === 0}
+      disabled={!billNr}
       onClick={print}
     >
       Kuva PDF

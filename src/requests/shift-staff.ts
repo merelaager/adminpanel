@@ -1,59 +1,27 @@
 import { queryOptions } from '@tanstack/react-query'
-import { StatusCodes } from 'http-status-codes'
-import { type Static, Type } from '@sinclair/typebox'
 
-import { apiFetch } from '@/api/apiFetch.ts'
+import type { paths } from '@/api/schema.gen'
+import type { SuccessData } from '@/api/types.ts'
+import { client } from '@/api/client.ts'
+import { toApiError, unwrapData } from '@/api/errors.ts'
 
-export const CertificateSchema = Type.Object({
-  name: Type.String(),
-  certId: Type.String(),
-  urlId: Type.String(),
-})
+export type ShiftStaffMember = SuccessData<
+  paths['/api/shifts/{shiftNr}/staff']['get']
+>['staff'][number]
 
-export const ShiftStaffSchema = Type.Object({
-  id: Type.Integer(),
-  shiftNr: Type.Integer(),
-  year: Type.Integer(),
-  name: Type.String(),
-  role: Type.String(),
-  userId: Type.Union([Type.Null(), Type.Integer()]),
-  certificates: Type.Array(CertificateSchema),
-})
-
-export type StaffCertificate = Static<typeof CertificateSchema>
-export type ShiftStaffMember = Static<typeof ShiftStaffSchema>
-
-type ShiftStaffAPISuccessResponse = {
-  status: 'success'
-  data: {
-    staff: ShiftStaffMember[]
-  }
-}
+export type StaffCertificate = ShiftStaffMember['certificates'][number]
 
 export const fetchShiftStaff = async (
   shiftNr: number,
-): Promise<ShiftStaffMember[]> => {
-  const response = await apiFetch(`/shifts/${shiftNr}/staff`, {
-    method: 'GET',
-    mode: 'cors',
-    credentials: 'include',
-  })
-
-  const jsRes = await response.json()
-
-  if (!response.ok) {
-    switch (response.status) {
-      case StatusCodes.UNAUTHORIZED:
-        throw new Error('Ligipääsuks pead olema autenditud!')
-      case StatusCodes.FORBIDDEN:
-        throw new Error(jsRes.data.permissions)
-      default:
-        console.error(jsRes)
-        throw new Error('Ootamatu viga: rohkem infot konsoolis.')
-    }
-  }
-
-  return (jsRes as ShiftStaffAPISuccessResponse).data.staff
+): Promise<Array<ShiftStaffMember>> => {
+  const { data, error, response } = await client.GET(
+    '/api/shifts/{shiftNr}/staff',
+    {
+      params: { path: { shiftNr } },
+    },
+  )
+  if (error !== undefined) throw toApiError(response.status, error)
+  return unwrapData(data).staff
 }
 
 export const shiftStaffFetchQueryOptions = (shiftNr: number) =>

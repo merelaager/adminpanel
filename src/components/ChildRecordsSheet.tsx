@@ -20,9 +20,11 @@ import {
 import { childRecordsQueryOptions } from '@/requests/records.ts'
 
 export const ChildRecordsSheet = ({
+  shiftNr,
   childId,
   childName,
 }: {
+  shiftNr: number
   childId: number
   childName: string
 }) => {
@@ -34,7 +36,7 @@ export const ChildRecordsSheet = ({
     isError,
     error,
   } = useQuery({
-    ...childRecordsQueryOptions(childId),
+    ...childRecordsQueryOptions(shiftNr, childId),
     enabled: open,
   })
 

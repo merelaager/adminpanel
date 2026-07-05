@@ -1,47 +1,25 @@
-import { StatusCodes } from 'http-status-codes'
 import { queryOptions } from '@tanstack/react-query'
 
-import { apiFetch } from '@/api/apiFetch.ts'
+import type { paths } from '@/api/schema.gen'
+import type { SuccessData } from '@/api/types.ts'
+import { client } from '@/api/client.ts'
+import { toApiError, unwrapData } from '@/api/errors.ts'
 
-export type ShiftUser = {
-  userId: number
-  name: string
-  shiftNr: number
-  role: string
-  roleId: number
-}
-
-type ShiftUsersAPISuccessResponse = {
-  status: 'success'
-  data: {
-    users: ShiftUser[]
-  }
-}
+export type ShiftUser = SuccessData<
+  paths['/api/shifts/{shiftNr}/users']['get']
+>['users'][number]
 
 export const fetchShiftUsers = async (
   shiftNr: number,
-): Promise<ShiftUser[]> => {
-  const response = await apiFetch(`/shifts/${shiftNr}/users`, {
-    method: 'GET',
-    mode: 'cors',
-    credentials: 'include',
-  })
-
-  const jsRes = await response.json()
-
-  if (!response.ok) {
-    switch (response.status) {
-      case StatusCodes.UNAUTHORIZED:
-        throw new Error('Ligipääsuks pead olema autenditud!')
-      case StatusCodes.FORBIDDEN:
-        throw new Error(jsRes.data.permissions)
-      default:
-        console.error(jsRes)
-        throw new Error('Ootamatu viga: rohkem infot konsoolis.')
-    }
-  }
-
-  return (jsRes as ShiftUsersAPISuccessResponse).data.users
+): Promise<Array<ShiftUser>> => {
+  const { data, error, response } = await client.GET(
+    '/api/shifts/{shiftNr}/users',
+    {
+      params: { path: { shiftNr } },
+    },
+  )
+  if (error !== undefined) throw toApiError(response.status, error)
+  return unwrapData(data).users
 }
 
 export const shiftUsersFetchQueryOptions = (shiftNr: number) =>

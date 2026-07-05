@@ -56,7 +56,7 @@ function RouteComponent() {
   const dateScores = new Map<string, DisplayTentScore[]>()
 
   // Split scores by date.
-  scores?.forEach((score) => {
+  scores.forEach((score) => {
     const dateString = new Date(score.createdAt).toLocaleDateString('et')
     const entries = dateScores.get(dateString)
     if (entries === undefined) {

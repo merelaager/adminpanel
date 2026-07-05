@@ -1,96 +1,41 @@
 import { queryOptions } from '@tanstack/react-query'
-import { type Static, Type } from '@sinclair/typebox'
-import { StatusCodes } from 'http-status-codes'
 
-import { apiFetch } from '@/api/apiFetch.ts'
+import type { paths } from '@/api/schema.gen'
+import type { SuccessData } from '@/api/types.ts'
+import { client } from '@/api/client.ts'
+import { toApiError, unwrapData } from '@/api/errors.ts'
 
-export const TentScoreSchema = Type.Object({
-  scoreId: Type.Number(),
-  score: Type.Number(),
-  createdAt: Type.String(),
-  tentNr: Type.Number(),
-})
+export type TentInfo = SuccessData<
+  paths['/api/shifts/{shiftNr}/tents/{tentNr}']['get']
+>
 
-export const TentInfoSchema = Type.Object({
-  campers: Type.Array(Type.String()),
-  scores: Type.Array(TentScoreSchema),
-})
-
-export type TentInfo = Static<typeof TentInfoSchema>
-
-export type TentScore = Static<typeof TentScoreSchema>
-
-type TentAPISuccessResponse = {
-  status: 'success'
-  data: TentInfo
-}
-
-type TentsAPISuccessResponse = {
-  status: 'success'
-  data: {
-    scores: TentScore[]
-  }
-}
+export type TentScore = TentInfo['scores'][number]
 
 export const fetchTentInfo = async (shiftNr: number, tentNr: number) => {
-  const response = await apiFetch(`/shifts/${shiftNr}/tents/${tentNr}`, {
-    method: 'GET',
-    mode: 'cors',
-    credentials: 'include',
-  })
-
-  const jsRes = await response.json()
-
-  if (!response.ok) {
-    switch (response.status) {
-      case StatusCodes.UNAUTHORIZED:
-        throw new Error('Ligipääsuks pead olema autenditud!')
-      case StatusCodes.FORBIDDEN:
-        throw new Error(jsRes.data.permissions)
-      default:
-        console.error(jsRes)
-        throw new Error('Ootamatu viga: rohkem infot konsoolis.')
-    }
-  }
-
-  return (jsRes as TentAPISuccessResponse).data
+  const { data, error, response } = await client.GET(
+    '/api/shifts/{shiftNr}/tents/{tentNr}',
+    { params: { path: { shiftNr, tentNr } } },
+  )
+  if (error !== undefined) throw toApiError(response.status, error)
+  return unwrapData(data)
 }
 
 export const fetchTentScores = async (shiftNr: number) => {
-  const response = await apiFetch(`/shifts/${shiftNr}/tents`, {
-    method: 'GET',
-    mode: 'cors',
-    credentials: 'include',
-  })
-
-  const jsRes = await response.json()
-
-  if (!response.ok) {
-    switch (response.status) {
-      case StatusCodes.UNAUTHORIZED:
-        throw new Error('Ligipääsuks pead olema autenditud!')
-      case StatusCodes.FORBIDDEN:
-        throw new Error(jsRes.data.permissions)
-      default:
-        console.error(jsRes)
-        throw new Error('Ootamatu viga: rohkem infot konsoolis.')
-    }
-  }
-
-  if (response.ok) return (jsRes as TentsAPISuccessResponse).data.scores
+  const { data, error, response } = await client.GET(
+    '/api/shifts/{shiftNr}/tents',
+    {
+      params: { path: { shiftNr } },
+    },
+  )
+  if (error !== undefined) throw toApiError(response.status, error)
+  return unwrapData(data).scores
 }
 
-export const deleteTentScore = async (scoreId: number) => {
-  const response = await apiFetch(`/grades/${scoreId}`, {
-    method: 'DELETE',
-    mode: 'cors',
-    credentials: 'include',
+export const deleteTentScore = async (gradeId: number) => {
+  const { error, response } = await client.DELETE('/api/grades/{gradeId}', {
+    params: { path: { gradeId } },
   })
-
-  if (response.ok) return null
-
-  console.error(await response.text())
-  throw new Error('Ootamatu viga: rohkem infot konsoolis.')
+  if (error !== undefined) throw toApiError(response.status, error)
 }
 
 export const addTentScore = async (
@@ -98,26 +43,15 @@ export const addTentScore = async (
   tentNr: number,
   score: number,
 ) => {
-  const response = await apiFetch(`/shifts/${shiftNr}/tents/${tentNr}`, {
-    method: 'POST',
-    mode: 'cors',
-    credentials: 'include',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ score }),
-  })
-
-  const jsRes = await response.json()
-  if (response.ok) return jsRes.data as TentScore
-
-  switch (response.status) {
-    case StatusCodes.UNAUTHORIZED:
-      throw new Error('Ligipääsuks pead olema autenditud!')
-    case StatusCodes.FORBIDDEN:
-      throw new Error(jsRes.data.permissions)
-    default:
-      console.error(jsRes)
-      throw new Error('Ootamatu viga: rohkem infot konsoolis.')
-  }
+  const { data, error, response } = await client.POST(
+    '/api/shifts/{shiftNr}/tents/{tentNr}',
+    {
+      params: { path: { shiftNr, tentNr } },
+      body: { score },
+    },
+  )
+  if (error !== undefined) throw toApiError(response.status, error)
+  return unwrapData(data)
 }
 
 export const shiftTentFetchQueryOptions = (shiftNr: number, tentNr: number) =>

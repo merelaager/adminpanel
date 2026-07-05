@@ -1,29 +1,11 @@
 import { create } from 'zustand'
-import { type Static, Type } from '@sinclair/typebox'
 
-import { apiFetch } from '@/api/apiFetch.ts'
+import type { paths } from '@/api/schema.gen'
+import type { SuccessData } from '@/api/types.ts'
+import { client } from '@/api/client.ts'
+import { toApiError, unwrapData } from '@/api/errors.ts'
 
-export const UserInfoSchema = Type.Object({
-  userId: Type.Integer(),
-  name: Type.String(),
-  nickname: Type.Union([Type.String(), Type.Null()]),
-  email: Type.Union([Type.String(), Type.Null()]),
-  currentShift: Type.Integer(),
-  currentRole: Type.String(),
-  isRoot: Type.Boolean(),
-  managedShifts: Type.Array(Type.Integer()),
-})
-
-export type User = {
-  userId: number
-  name: string
-  nickname: string | null
-  email: string | null
-  currentShift: number
-  currentRole: string
-  isRoot: boolean
-  managedShifts: number[]
-}
+export type User = SuccessData<paths['/api/auth/me']['get']>
 
 type AuthState = {
   isLoading: boolean
@@ -38,112 +20,31 @@ type UpdateAction = {
   updateCurrentShift: (newShift: User['currentShift']) => void
 }
 
-type UserAuthData = {
-  status: 'success'
-  data: Static<typeof UserInfoSchema>
-}
-
 export const useAuthStore = create<AuthState & UpdateAction>((set) => ({
   isLoading: true,
   isError: false,
   user: null,
   fetchUser: async () => {
-    let response: Response
     try {
-      response = await apiFetch('/auth/me', {
-        mode: 'cors',
-        credentials: 'include',
-      })
-    } catch (error) {
-      console.log(error)
+      const { data, response } = await client.GET('/api/auth/me')
+      if (!response.ok) {
+        set({ isLoading: false })
+        return
+      }
+      set({ isLoading: false, user: unwrapData(data!) })
+    } catch {
       set({ isLoading: false, isError: true })
-      return
     }
-
-    if (!response.ok) {
-      set({ isLoading: false })
-      return
-    }
-
-    console.log('I fetched the user!')
-
-    const jsRes: UserAuthData = await response.json()
-    const {
-      userId,
-      name,
-      nickname,
-      email,
-      currentShift,
-      currentRole,
-      isRoot,
-      managedShifts,
-    } = jsRes.data
-    set({
-      isLoading: false,
-      user: {
-        userId,
-        name,
-        nickname,
-        email,
-        currentShift,
-        currentRole,
-        isRoot,
-        managedShifts,
-      },
-    })
   },
   login: async (username: string, password: string) => {
-    const response = await apiFetch('/auth/login', {
-      method: 'POST',
-      mode: 'cors',
-      credentials: 'include',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username, password }),
+    const { data, error, response } = await client.POST('/api/auth/login', {
+      body: { username, password },
     })
-
-    if (!response.ok) {
-      const jsres = await response.json()
-      let error: string
-
-      if (jsres.status === 'fail') {
-        error = jsres.data.message
-      } else {
-        error = jsres.message
-      }
-
-      throw new Error(error)
-    }
-
-    const jsRes: UserAuthData = await response.json()
-    const {
-      userId,
-      name,
-      nickname,
-      email,
-      currentShift,
-      currentRole,
-      isRoot,
-      managedShifts,
-    } = jsRes.data
-    set({
-      user: {
-        userId,
-        name,
-        nickname,
-        email,
-        currentShift,
-        currentRole,
-        isRoot,
-        managedShifts,
-      },
-    })
+    if (error !== undefined) throw toApiError(response.status, error)
+    set({ user: unwrapData(data) })
   },
   logout: async () => {
-    await apiFetch('/auth/logout', {
-      method: 'POST',
-      mode: 'cors',
-      credentials: 'include',
-    })
+    await client.POST('/api/auth/logout')
     set({ user: null })
   },
   updateCurrentShift: (newShift) => {

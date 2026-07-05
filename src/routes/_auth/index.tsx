@@ -159,6 +159,9 @@ const formSchema = z.object({
 })
 
 const changePasswordFormSchema = z.object({
+  currentPassword: z.string().min(1, {
+    message: 'Praegune salasõna on kohustuslik!',
+  }),
   password: z.string().min(6, {
     message: 'Salasõna peab olema vähemat 6 tähemärki pikk!',
   }),
@@ -169,6 +172,7 @@ const ChangePasswordCard = () => {
   const form = useForm<z.infer<typeof changePasswordFormSchema>>({
     resolver: zodResolver(changePasswordFormSchema),
     defaultValues: {
+      currentPassword: '',
       password: '',
       confirmPassword: '',
     },
@@ -183,7 +187,10 @@ const ChangePasswordCard = () => {
     }
 
     try {
-      await changePassword(values.password.trim())
+      await changePassword(
+        values.currentPassword.trim(),
+        values.password.trim(),
+      )
 
       toast.message('Salasõna muudetud!')
     } catch (error) {
@@ -202,6 +209,19 @@ const ChangePasswordCard = () => {
           className="flex flex-col gap-4"
           onSubmit={form.handleSubmit(onFormSubmit)}
         >
+          <FormField
+            control={form.control}
+            name="currentPassword"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Praegune salasõna</FormLabel>
+                <FormControl>
+                  <Input {...field} type="password" />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
           <FormField
             control={form.control}
             name="password"

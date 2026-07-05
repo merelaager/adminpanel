@@ -1,44 +1,16 @@
-import { apiFetch } from '@/api/apiFetch.ts'
-import { StatusCodes } from 'http-status-codes'
+import { client } from '@/api/client.ts'
+import { toApiError } from '@/api/errors.ts'
 
 export const submitPasswordResetRequest = async (email: string) => {
-  const response = await apiFetch(`/account/password`, {
-    method: 'PUT',
-    mode: 'cors',
-    credentials: 'include',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email }),
+  const { error, response } = await client.POST('/api/account/password-reset', {
+    body: { email },
   })
-
-  if (!response.ok) {
-    const jsRes = await response.json()
-    switch (response.status) {
-      case StatusCodes.NOT_FOUND:
-        throw new Error(jsRes.data.message)
-      default:
-        console.error(jsRes)
-        throw new Error('Ootamatu viga: rohkem infot konsoolis.')
-    }
-  }
+  if (!response.ok) throw toApiError(response.status, error)
 }
 
 export const resetPassword = async (password: string, token: string) => {
-  const response = await apiFetch(`/account/password`, {
-    method: 'PUT',
-    mode: 'cors',
-    credentials: 'include',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ password, token }),
+  const { error, response } = await client.PUT('/api/account/password', {
+    body: { password, token },
   })
-
-  if (!response.ok) {
-    const jsRes = await response.json()
-    switch (response.status) {
-      case StatusCodes.NOT_FOUND:
-        throw new Error(jsRes.data.message)
-      default:
-        console.error(jsRes)
-        throw new Error('Ootamatu viga: rohkem infot konsoolis.')
-    }
-  }
+  if (error !== undefined) throw toApiError(response.status, error)
 }
