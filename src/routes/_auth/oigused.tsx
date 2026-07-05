@@ -32,7 +32,7 @@ export const Route = createFileRoute('/_auth/oigused')({
   },
 })
 
-const columns: Array<ColumnDef<ShiftUser>> = [
+const userColumns: Array<ColumnDef<ShiftUser>> = [
   {
     accessorKey: 'name',
     header: ({ column }) => {
@@ -132,7 +132,7 @@ function RouteComponent() {
   return (
     <div className="mx-6">
       <p>Õiguseid veel ei saa kambüüsis muuta.</p>
-      <DataTable columns={columns} data={sortedUsers} />
+      <DataTable columns={userColumns} data={sortedUsers} />
     </div>
   )
 }

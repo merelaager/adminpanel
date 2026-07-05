@@ -80,7 +80,7 @@ const AddGradeCard = ({ shiftNr, tentNr }: AddGradeCardProps) => {
     },
   })
 
-  const onSubmit = async (values: z.infer<typeof AddGradeSchema>) => {
+  const onSubmit = (values: z.infer<typeof AddGradeSchema>) => {
     mutation.mutate(values.score)
   }
 
@@ -153,8 +153,8 @@ const DeleteScoreButton = ({ scoreId, tentNr }: DeleteScoreButtonProps) => {
   const shiftNr = useUser().currentShift
 
   const mutation = useMutation({
-    mutationFn: async (scoreId: number) => {
-      await deleteTentScore(scoreId)
+    mutationFn: async (targetScoreId: number) => {
+      await deleteTentScore(targetScoreId)
     },
     onError: (error: Error) => {
       toast.error('Viga hinde kustutamisel!', {

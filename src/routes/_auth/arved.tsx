@@ -167,8 +167,8 @@ const billTableColumns: Array<ColumnDef<ParentBillData>> = [
 
 const GenerateBillButton = ({ email }: { email: string }) => {
   const mutation = useMutation({
-    mutationFn: (email: string) => {
-      return generateBill(email)
+    mutationFn: (targetEmail: string) => {
+      return generateBill(targetEmail)
     },
     onError: (error: Error) => {
       toast.error('Viga arve genereerimisel!', {
@@ -208,24 +208,24 @@ const SendBillButton = ({
   const shiftNr = useUser().currentShift
 
   const mutation = useMutation({
-    mutationFn: async (email: string) => {
-      await sendBill(email)
-      return email
+    mutationFn: async (targetEmail: string) => {
+      await sendBill(targetEmail)
+      return targetEmail
     },
     onError: (error: Error) => {
       toast.error('Viga arve saatmisel!', {
         description: error.message,
       })
     },
-    onSuccess: (email) => {
+    onSuccess: (sentEmail) => {
       toast.success('Arve edukalt saadetud.', {
-        description: `Saaja: ${name} (${email})`,
+        description: `Saaja: ${name} (${sentEmail})`,
       })
 
       updateListItem<ParentBillData>(
         queryClient,
         shiftBillingFetchQueryOptions(shiftNr).queryKey,
-        (r) => r.email === email,
+        (r) => r.email === sentEmail,
         (r) => ({
           ...r,
           records: r.records.map((record) => ({ ...record, billSent: true })),

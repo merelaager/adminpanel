@@ -80,7 +80,7 @@ function RouteComponent() {
       return
     }
 
-    const dateScores: Array<DisplayTentScore> = []
+    const dailyScores: Array<DisplayTentScore> = []
     for (let i = 1; i <= 10; ++i) {
       let totalCount = 0
       let totalScore = 0
@@ -94,7 +94,7 @@ function RouteComponent() {
       const dailyScore = totalScore / totalCount
 
       if (totalCount > 0) {
-        dateScores.push({
+        dailyScores.push({
           score: dailyScore,
           tentNr: i,
           createdAt: dateString,
@@ -104,7 +104,7 @@ function RouteComponent() {
       if (!isNaN(dailyScore)) summedScores[i - 1] += dailyScore
     }
 
-    uniqueDateScores.set(dateString, dateScores)
+    uniqueDateScores.set(dateString, dailyScores)
   })
 
   const averages: Array<DisplayTentScore> = []

@@ -190,7 +190,7 @@ const CreateTeamCard = ({ shiftNr }: { shiftNr: number }) => {
     },
   })
 
-  const onSubmit = async (values: z.infer<typeof TeamCreateSchema>) => {
+  const onSubmit = (values: z.infer<typeof TeamCreateSchema>) => {
     const { teamName } = values
     mutation.mutate({ shiftNr, name: teamName })
   }
