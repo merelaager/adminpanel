@@ -89,6 +89,9 @@ function RouteComponent() {
 
   const ages = Array.from(ageMap.values()).sort((a, b) => a.age - b.age)
 
+  const formatAverage = (total: number, count: number) =>
+    count === 0 ? '–' : (total / count).toFixed(1)
+
   return (
     <div className="px-6 flex flex-col gap-6 overflow-y-scroll h-[calc((100%-var(--spacing)*22))]">
       <Card>
@@ -96,13 +99,12 @@ function RouteComponent() {
           <CardTitle>{shiftNr}v laste vanus</CardTitle>
           <CardDescription className="flex gap-2 h-4 items-center flex-wrap">
             <div>
-              Keskmine:{' '}
-              {((mAgeTotal + fAgeTotal) / (mCount + fCount)).toFixed(1)}
+              Keskmine: {formatAverage(mAgeTotal + fAgeTotal, mCount + fCount)}
             </div>
             <Separator orientation="vertical" />
-            <div>Poiste keskmine: {(mAgeTotal / mCount).toFixed(1)}</div>
+            <div>Poiste keskmine: {formatAverage(mAgeTotal, mCount)}</div>
             <Separator orientation="vertical" />
-            <div>Tüdrukute keskmine: {(fAgeTotal / fCount).toFixed(1)}</div>
+            <div>Tüdrukute keskmine: {formatAverage(fAgeTotal, fCount)}</div>
           </CardDescription>
         </CardHeader>
         <CardContent>
