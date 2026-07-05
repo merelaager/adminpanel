@@ -134,7 +134,12 @@ function RouteComponent() {
   const [timerVersion, setTimerVersion] = useState(0)
 
   const editTimer = (t: HTMLInputElement) => {
-    setTimerLength(Number(t.value))
+    const value = Number(t.value)
+    if (!Number.isFinite(value) || value <= 0) {
+      t.value = String(timerLength)
+      return
+    }
+    setTimerLength(value)
     setTimerVersion((v) => v + 1)
   }
 
