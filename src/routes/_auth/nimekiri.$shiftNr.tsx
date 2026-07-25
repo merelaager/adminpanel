@@ -8,8 +8,9 @@ import {
 import {
   BadgeEuroIcon,
   ChevronDownIcon,
-  ChevronUpIcon,
   ChevronsUpDownIcon,
+  ChevronUpIcon,
+  DownloadIcon,
   ListFilterIcon,
   MailCheckIcon,
   MarsIcon,
@@ -18,12 +19,6 @@ import {
 } from 'lucide-react'
 import { toast } from 'sonner'
 
-import {
-  getCoreRowModel,
-  getFilteredRowModel,
-  getSortedRowModel,
-} from '@tanstack/table-core'
-import { flexRender, useReactTable } from '@tanstack/react-table'
 import type {
   Column,
   ColumnDef,
@@ -32,10 +27,22 @@ import type {
   SortingState,
   VisibilityState,
 } from '@tanstack/table-core'
+import {
+  getCoreRowModel,
+  getFilteredRowModel,
+  getSortedRowModel,
+} from '@tanstack/table-core'
+import { flexRender, useReactTable } from '@tanstack/react-table'
 import type {
   PatchKeys,
   PatchObject,
   RegistrationEntry,
+} from '@/requests/registrations.ts'
+import {
+  fetchShiftPdf,
+  patchRegistrations,
+  registrationsQueryOptions,
+  Sex,
 } from '@/requests/registrations.ts'
 import { useUser } from '@/stores/authStore.ts'
 
@@ -68,15 +75,9 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu.tsx'
-
-import {
-  Sex,
-  fetchShiftPdf,
-  patchRegistrations,
-  registrationsQueryOptions,
-} from '@/requests/registrations.ts'
 import { updateListItem } from '@/lib/query-cache.ts'
 import { openBlobInNewTab } from '@/lib/blob.ts'
+import { downloadTableCsv } from '@/lib/csv.ts'
 
 export const Route = createFileRoute('/_auth/nimekiri/$shiftNr')({
   component: RouteComponent,
@@ -102,10 +103,6 @@ type RegistrationMutation = {
   patch: PatchObject
 }
 
-// Per-render view flags and mutation handlers are threaded to the cells through
-// the table `meta` so the column definitions can stay stable at module scope.
-// Recreating them on every render would give each cell a new component identity
-// and remount its subtree, tearing down Radix tooltips before they can open.
 declare module '@tanstack/table-core' {
   interface TableMeta<TData extends RowData> {
     isDetailView: boolean
@@ -116,6 +113,11 @@ declare module '@tanstack/table-core' {
       registration: RegistrationEntry,
     ) => void
     toggleRegistration: (registration: RegistrationEntry) => void
+  }
+
+  interface ColumnMeta<TData extends RowData, TValue> {
+    csvHeader?: string
+    csvValue?: (row: TData) => string | number | null | undefined
   }
 }
 
@@ -174,6 +176,7 @@ const registrationColumns: Array<ColumnDef<RegistrationEntry>> = [
     id: 'name',
     accessorKey: 'child.name',
     header: 'Nimi',
+    meta: { csvHeader: 'Nimi', csvValue: (row) => row.child.name },
     cell: ({ row, table }) => {
       const registration = row.original
       const { isDetailView } = table.options.meta!
@@ -215,6 +218,10 @@ const registrationColumns: Array<ColumnDef<RegistrationEntry>> = [
     id: 'isRegistered',
     accessorKey: 'isRegistered',
     header: 'Reg?',
+    meta: {
+      csvHeader: 'Reg?',
+      csvValue: (row) => (row.isRegistered ? 'Jah' : 'Ei'),
+    },
     enableSorting: false,
     cell: ({ row, table }) => (
       <Button
@@ -230,6 +237,7 @@ const registrationColumns: Array<ColumnDef<RegistrationEntry>> = [
     id: 'pricePaid',
     accessorKey: 'pricePaid',
     header: 'Makstud',
+    meta: { csvHeader: 'Makstud', csvValue: (row) => row.pricePaid },
     cell: ({ row, table }) =>
       table.options.meta!.isPriceEditable ? (
         <Input
@@ -247,6 +255,7 @@ const registrationColumns: Array<ColumnDef<RegistrationEntry>> = [
     id: 'priceToPay',
     accessorKey: 'priceToPay',
     header: 'Maksta',
+    meta: { csvHeader: 'Maksta', csvValue: (row) => row.priceToPay },
     cell: ({ row, table }) =>
       table.options.meta!.isPriceEditable ? (
         <Input
@@ -264,17 +273,20 @@ const registrationColumns: Array<ColumnDef<RegistrationEntry>> = [
     id: 'billId',
     accessorKey: 'billId',
     header: 'Arve Nr.',
+    meta: { csvHeader: 'Arve Nr.', csvValue: (row) => row.billId },
     cell: ({ row }) => <span className="font-mono">{row.original.billId}</span>,
   },
   {
     id: 'contactName',
     accessorKey: 'contactName',
     header: 'Kontakt',
+    meta: { csvHeader: 'Kontakt', csvValue: (row) => row.contactName },
   },
   {
     id: 'contactEmail',
     accessorKey: 'contactEmail',
     header: 'Meil',
+    meta: { csvHeader: 'Meil', csvValue: (row) => row.contactEmail },
     cell: ({ row }) => (
       <div className="flex justify-between gap-4">
         <a
@@ -295,6 +307,7 @@ const registrationColumns: Array<ColumnDef<RegistrationEntry>> = [
     id: 'sex',
     accessorKey: 'child.sex',
     header: ({ column }) => <SexFilterHeader column={column} />,
+    meta: { csvHeader: 'Sugu', csvValue: (row) => row.child.sex },
     enableSorting: false,
     filterFn: (row, columnId, filterValue: Array<Sex>) =>
       filterValue.includes(row.getValue(columnId)),
@@ -309,12 +322,14 @@ const registrationColumns: Array<ColumnDef<RegistrationEntry>> = [
     id: 'isOld',
     accessorKey: 'isOld',
     header: 'Vana?',
+    meta: { csvHeader: 'Vana?', csvValue: (row) => (row.isOld ? 'Jah' : 'Ei') },
     cell: ({ row }) => (row.original.isOld ? 'Jah' : 'Ei'),
   },
   {
     id: 'currentAge',
     accessorKey: 'child.currentAge',
     header: 'Vanus',
+    meta: { csvHeader: 'Vanus', csvValue: (row) => row.child.currentAge },
     cell: ({ row }) => `${row.original.child.currentAge}a`,
   },
 ]
@@ -427,6 +442,19 @@ export const RegistrationDataTable = ({
             value={globalFilter}
             onChange={(e) => setGlobalFilter(e.target.value)}
           />
+        )}
+        {registrations.length > 0 && (
+          <Button
+            variant="outline"
+            size="sm"
+            className="ml-auto"
+            onClick={() =>
+              downloadTableCsv(table, `${title.toLowerCase()}-${shiftNr}v.csv`)
+            }
+          >
+            <DownloadIcon />
+            CSV
+          </Button>
         )}
       </div>
       <div className="mx-6 rounded-md border">
