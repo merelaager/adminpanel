@@ -25,12 +25,9 @@ export const billStatusLabels: Record<BillStatus, string> = {
 }
 
 export const sendBill = async (email: string) => {
-  const { data, error, response } = await client.POST(
-    '/api/notifications/bills',
-    {
-      body: { email },
-    },
-  )
+  const { data, error, response } = await client.POST('/api/bills/send', {
+    body: { email },
+  })
   if (error !== undefined) throw toApiError(response.status, error)
   return unwrapData(data).billNrs
 }
