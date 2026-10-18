@@ -8,8 +8,8 @@ import {
 import {
   BadgeEuroIcon,
   ChevronDownIcon,
-  ChevronsUpDownIcon,
   ChevronUpIcon,
+  ChevronsUpDownIcon,
   DownloadIcon,
   ListFilterIcon,
   MailCheckIcon,
@@ -19,6 +19,12 @@ import {
 } from 'lucide-react'
 import { toast } from 'sonner'
 
+import {
+  getCoreRowModel,
+  getFilteredRowModel,
+  getSortedRowModel,
+} from '@tanstack/table-core'
+import { flexRender, useReactTable } from '@tanstack/react-table'
 import type {
   Column,
   ColumnDef,
@@ -27,22 +33,16 @@ import type {
   SortingState,
   VisibilityState,
 } from '@tanstack/table-core'
-import {
-  getCoreRowModel,
-  getFilteredRowModel,
-  getSortedRowModel,
-} from '@tanstack/table-core'
-import { flexRender, useReactTable } from '@tanstack/react-table'
 import type {
   PatchKeys,
   PatchObject,
   RegistrationEntry,
 } from '@/requests/registrations.ts'
 import {
+  Sex,
   fetchShiftPdf,
   patchRegistrations,
   registrationsQueryOptions,
-  Sex,
 } from '@/requests/registrations.ts'
 import { useUser } from '@/stores/authStore.ts'
 
