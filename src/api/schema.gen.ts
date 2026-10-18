@@ -1713,6 +1713,7 @@ export interface paths {
                                 records: {
                                     name: string;
                                     email: string;
+                                    reference: string | null;
                                     records: {
                                         childName: string;
                                         priceToPay: number;

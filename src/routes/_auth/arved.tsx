@@ -20,6 +20,7 @@ import { formatCents } from '@/lib/money.ts'
 
 import {
   fetchBillPdf,
+  invalidateBillingQueries,
   sendBill,
   shiftBillingFetchQueryOptions,
 } from '@/requests/billing.ts'
@@ -36,6 +37,8 @@ import {
 
 import { BillStatusBadge } from '@/components/BillStatusBadge.tsx'
 import { DataTable } from '@/components/data-table.tsx'
+import { RecordPaymentDialog } from '@/components/RecordPaymentDialog.tsx'
+import { ReissueBillButton } from '@/components/ReissueBillButton.tsx'
 
 export const Route = createFileRoute('/_auth/arved')({
   component: RouteComponent,
@@ -157,6 +160,13 @@ const billTableColumns: Array<ColumnDef<ParentBillData>> = [
     },
   },
   {
+    accessorKey: 'reference',
+    header: 'Viitenumber',
+    cell: ({ row }) => (
+      <span className="font-mono">{row.original.reference ?? '–'}</span>
+    ),
+  },
+  {
     id: 'bills',
     accessorFn: (row) => summarizeParent(row).bills.at(0)?.number ?? 0,
     header: ({ column }) => <SortableHeader column={column} title="Arved" />,
@@ -191,15 +201,28 @@ const billTableColumns: Array<ColumnDef<ParentBillData>> = [
   },
   {
     id: 'actions',
-    cell: ({ row }) => (
-      <SendBillButton
-        name={row.original.name}
-        email={row.original.email}
-        hasSomethingToSend={summarizeParent(row.original).hasSomethingToSend}
-      />
-    ),
+    cell: ({ row }) => <ParentActions parent={row.original} />,
   },
 ]
+
+const ParentActions = ({ parent }: { parent: ParentBillData }) => {
+  const { isRoot } = useUser()
+  return (
+    <div className="flex justify-end gap-2">
+      <SendBillButton
+        name={parent.name}
+        email={parent.email}
+        hasSomethingToSend={summarizeParent(parent).hasSomethingToSend}
+      />
+      {isRoot && (
+        <RecordPaymentDialog
+          reference={parent.reference}
+          payerName={parent.name}
+        />
+      )}
+    </div>
+  )
+}
 
 const BillChip = ({ bill }: { bill: BillSummary }) => {
   const openPdf = async () => {
@@ -215,16 +238,23 @@ const BillChip = ({ bill }: { bill: BillSummary }) => {
     openBlobInNewTab(pdfBlob)
   }
 
+  const { isRoot } = useUser()
+
   return (
-    <Button
-      variant="outline"
-      size="sm"
-      onClick={openPdf}
-      title={bill.sent ? 'Saadetud. Ava PDF' : 'Saatmata. Ava PDF'}
-    >
-      <span className="font-mono">{bill.number}</span>
-      <BillStatusBadge status={bill.status} />
-    </Button>
+    <div className="flex items-center">
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={openPdf}
+        title={bill.sent ? 'Saadetud. Ava PDF' : 'Saatmata. Ava PDF'}
+      >
+        <span className="font-mono">{bill.number}</span>
+        <BillStatusBadge status={bill.status} />
+      </Button>
+      {isRoot && bill.status !== 'void' && (
+        <ReissueBillButton billNr={bill.number} />
+      )}
+    </div>
   )
 }
 
@@ -253,11 +283,7 @@ const SendBillButton = ({
           : `Arved ${billNrs.join(', ')} saadetud.`
       toast.success(title, { description: `Saaja: ${name} (${email})` })
     },
-    onSettled: () =>
-      Promise.all([
-        queryClient.invalidateQueries({ queryKey: ['billing'] }),
-        queryClient.invalidateQueries({ queryKey: ['registrations'] }),
-      ]),
+    onSettled: () => invalidateBillingQueries(queryClient),
   })
 
   return (

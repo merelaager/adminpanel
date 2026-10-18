@@ -1,4 +1,5 @@
 import { queryOptions } from '@tanstack/react-query'
+import type { QueryClient } from '@tanstack/react-query'
 
 import type { paths } from '@/api/schema.gen'
 import type { SuccessData } from '@/api/types.ts'
@@ -43,6 +44,25 @@ export const fetchBillPdf = async (billNr: number) => {
   return data
 }
 
+export const reissueBill = async (billNr: number) => {
+  const { data, error, response } = await client.POST(
+    '/api/bills/{billNr}/reissue',
+    {
+      params: { path: { billNr } },
+    },
+  )
+  if (error !== undefined) throw toApiError(response.status, error)
+  return unwrapData(data).billNr
+}
+
+export const recordPayment = async (reference: string, amountCents: number) => {
+  const { data, error, response } = await client.POST('/api/payments/', {
+    body: { reference, amountCents },
+  })
+  if (error !== undefined) throw toApiError(response.status, error)
+  return unwrapData(data).paymentId
+}
+
 export const fetchShiftBilling = async (shiftNr: number) => {
   const { data, error, response } = await client.GET(
     '/api/shifts/{shiftNr}/billing',
@@ -59,3 +79,9 @@ export const shiftBillingFetchQueryOptions = (shiftNr: number) =>
     queryKey: ['billing', shiftNr],
     queryFn: () => fetchShiftBilling(shiftNr),
   })
+
+export const invalidateBillingQueries = (queryClient: QueryClient) =>
+  Promise.all([
+    queryClient.invalidateQueries({ queryKey: ['billing'] }),
+    queryClient.invalidateQueries({ queryKey: ['registrations'] }),
+  ])
