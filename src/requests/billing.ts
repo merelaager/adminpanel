@@ -11,6 +11,18 @@ export type ParentBillData = SuccessData<
 
 export type ChildBillData = ParentBillData['records'][number]
 
+export type BillSummary = NonNullable<ChildBillData['bill']>
+
+export type BillStatus = BillSummary['status']
+
+export const billStatusLabels: Record<BillStatus, string> = {
+  paid: 'Makstud',
+  open: 'Maksmata',
+  'booking-fee-overdue': 'Bronn maksmata',
+  'camp-fee-overdue': 'Maksetähtaeg möödas',
+  void: 'Tühistatud',
+}
+
 export const sendBill = async (email: string) => {
   const { error, response } = await client.POST('/api/notifications/bills', {
     body: { email },
@@ -25,9 +37,9 @@ export const generateBill = async (email: string) => {
   if (error !== undefined) throw toApiError(response.status, error)
 }
 
-export const fetchBillPdf = async (billId: number) => {
-  const { data, error, response } = await client.GET('/api/bills/{billId}', {
-    params: { path: { billId } },
+export const fetchBillPdf = async (billNr: number) => {
+  const { data, error, response } = await client.GET('/api/bills/{billNr}', {
+    params: { path: { billNr } },
     parseAs: 'blob',
   })
   if (error !== undefined) throw toApiError(response.status, error)

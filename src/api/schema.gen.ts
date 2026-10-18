@@ -497,7 +497,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/bills/{billId}": {
+    "/api/bills/{billNr}": {
         parameters: {
             query?: never;
             header?: never;
@@ -509,7 +509,7 @@ export interface paths {
                 query?: never;
                 header?: never;
                 path: {
-                    billId: number;
+                    billNr: number;
                 };
                 cookie?: never;
             };
@@ -549,7 +549,7 @@ export interface paths {
                             /** @enum {string} */
                             status: "fail";
                             data: {
-                                billId: string;
+                                billNr: string;
                             };
                         };
                     };
@@ -653,6 +653,94 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/bills/{billNr}/reissue": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    billNr: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @enum {string} */
+                            status: "success";
+                            data: {
+                                billNr: number | null;
+                            } | null;
+                        };
+                    };
+                };
+                /** @description Default Response */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @enum {string} */
+                            status: "fail";
+                            data: {
+                                permissions: string;
+                            };
+                        };
+                    };
+                };
+                /** @description Default Response */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @enum {string} */
+                            status: "fail";
+                            data: {
+                                billNr: string;
+                            };
+                        };
+                    };
+                };
+                /** @description Default Response */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @enum {string} */
+                            status: "fail";
+                            data: {
+                                billNr: string;
+                            };
+                        };
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/grades/{gradeId}": {
         parameters: {
             query?: never;
@@ -702,7 +790,64 @@ export interface paths {
         };
         options?: never;
         head?: never;
-        patch?: never;
+        patch: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    gradeId: number;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": {
+                        score: number;
+                    };
+                };
+            };
+            responses: {
+                /** @description Default Response */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": unknown;
+                    };
+                };
+                /** @description Default Response */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @enum {string} */
+                            status: "fail";
+                            data: {
+                                permissions: string;
+                            };
+                        };
+                    };
+                };
+                /** @description Default Response */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @enum {string} */
+                            status: "fail";
+                            data: {
+                                gradeId: string;
+                            };
+                        };
+                    };
+                };
+            };
+        };
         trace?: never;
     };
     "/api/notifications/bills": {
@@ -778,6 +923,84 @@ export interface paths {
                     };
                     content: {
                         "application/json": components["schemas"]["def-0"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/payments/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": {
+                        reference: string;
+                        amountCents: number;
+                    };
+                };
+            };
+            responses: {
+                /** @description Default Response */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @enum {string} */
+                            status: "success";
+                            data: {
+                                paymentId: number;
+                            } | null;
+                        };
+                    };
+                };
+                /** @description Default Response */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @enum {string} */
+                            status: "fail";
+                            data: {
+                                permissions: string;
+                            };
+                        };
+                    };
+                };
+                /** @description Default Response */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @enum {string} */
+                            status: "fail";
+                            data: {
+                                reference: string;
+                            };
+                        };
                     };
                 };
             };
@@ -942,8 +1165,8 @@ export interface paths {
             requestBody: {
                 content: {
                     "application/json": {
-                        teamId?: null | number;
-                        tentNr?: null | number;
+                        teamId?: number | null;
+                        tentNr?: number | null;
                         isPresent?: boolean;
                     };
                 };
@@ -1067,11 +1290,17 @@ export interface paths {
                                     road?: string;
                                     county?: string;
                                     country?: string;
-                                    addendum?: null | string;
-                                    pricePaid?: number;
+                                    addendum?: string | null;
                                     priceToPay?: number;
-                                    notifSent?: boolean;
-                                    billId?: number | null;
+                                    bill?: {
+                                        number: number;
+                                        sent: boolean;
+                                        status: "paid" | "open" | "booking-fee-overdue" | "camp-fee-overdue" | "void";
+                                        paidCents: number;
+                                        totalCents: number;
+                                        /** Format: date-time */
+                                        paymentsUpdatedAt: string | null;
+                                    } | null;
                                     contactName?: string;
                                     contactNumber?: string;
                                     contactEmail?: string;
@@ -1233,7 +1462,6 @@ export interface paths {
                     "application/json": {
                         isRegistered?: boolean;
                         isOld?: boolean;
-                        pricePaid?: number;
                         priceToPay?: number;
                     };
                 };
@@ -1479,13 +1707,19 @@ export interface paths {
                                 records: {
                                     name: string;
                                     email: string;
-                                    billNr: null | number;
                                     records: {
                                         childName: string;
-                                        pricePaid: number;
                                         priceToPay: number;
                                         shiftNr: number;
-                                        billSent: boolean;
+                                        bill: {
+                                            number: number;
+                                            sent: boolean;
+                                            status: "paid" | "open" | "booking-fee-overdue" | "camp-fee-overdue" | "void";
+                                            paidCents: number;
+                                            totalCents: number;
+                                            /** Format: date-time */
+                                            paymentsUpdatedAt: string | null;
+                                        } | null;
                                     }[];
                                 }[];
                             } | null;
@@ -1678,11 +1912,11 @@ export interface paths {
                                     year: number;
                                     name: string;
                                     role: string;
-                                    userId: null | number;
+                                    userId: number | null;
                                     certificates: {
                                         name: string;
                                         certId: string;
-                                        urlId: null | string;
+                                        urlId: string | null;
                                     }[];
                                 }[];
                             } | null;

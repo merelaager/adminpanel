@@ -44,6 +44,7 @@ import {
   patchRegistrations,
   registrationsQueryOptions,
 } from '@/requests/registrations.ts'
+import { billStatusLabels } from '@/requests/billing.ts'
 import { useUser } from '@/stores/authStore.ts'
 
 import { Button } from '@/components/ui/button.tsx'
@@ -180,10 +181,9 @@ const registrationColumns: Array<ColumnDef<RegistrationEntry>> = [
     cell: ({ row, table }) => {
       const registration = row.original
       const { isDetailView } = table.options.meta!
-      const isFinanceAvailable = registration.pricePaid !== undefined
-      const isPaid = registration.pricePaid === registration.priceToPay
+      const isPaid = registration.bill?.status === 'paid'
 
-      const displayFinanceBadge = !isDetailView && isFinanceAvailable && isPaid
+      const displayFinanceBadge = !isDetailView && isPaid
 
       return (
         <div className="flex justify-between gap-4">
@@ -234,24 +234,6 @@ const registrationColumns: Array<ColumnDef<RegistrationEntry>> = [
     ),
   },
   {
-    id: 'pricePaid',
-    accessorKey: 'pricePaid',
-    header: 'Makstud',
-    meta: { csvHeader: 'Makstud', csvValue: (row) => row.pricePaid },
-    cell: ({ row, table }) =>
-      table.options.meta!.isPriceEditable ? (
-        <Input
-          className="w-16 font-mono"
-          defaultValue={row.original.pricePaid}
-          onBlur={(e) =>
-            table.options.meta!.updatePrice(e, 'pricePaid', row.original)
-          }
-        />
-      ) : (
-        <span className="font-mono">{row.original.pricePaid}</span>
-      ),
-  },
-  {
     id: 'priceToPay',
     accessorKey: 'priceToPay',
     header: 'Maksta',
@@ -270,11 +252,34 @@ const registrationColumns: Array<ColumnDef<RegistrationEntry>> = [
       ),
   },
   {
-    id: 'billId',
-    accessorKey: 'billId',
+    id: 'billNr',
+    accessorFn: (row) => row.bill?.number,
     header: 'Arve Nr.',
-    meta: { csvHeader: 'Arve Nr.', csvValue: (row) => row.billId },
-    cell: ({ row }) => <span className="font-mono">{row.original.billId}</span>,
+    meta: { csvHeader: 'Arve Nr.', csvValue: (row) => row.bill?.number },
+    cell: ({ row }) => (
+      <span className="font-mono">{row.original.bill?.number}</span>
+    ),
+  },
+  {
+    id: 'billStatus',
+    accessorFn: (row) => row.bill?.status,
+    header: 'Arve seis',
+    meta: {
+      csvHeader: 'Arve seis',
+      csvValue: (row) => row.bill && billStatusLabels[row.bill.status],
+    },
+    cell: ({ row }) => {
+      const bill = row.original.bill
+      if (!bill) return null
+      const isOverdue =
+        bill.status === 'booking-fee-overdue' ||
+        bill.status === 'camp-fee-overdue'
+      return (
+        <Badge variant={isOverdue ? 'destructive' : 'outline'}>
+          {billStatusLabels[bill.status]}
+        </Badge>
+      )
+    },
   },
   {
     id: 'contactName',
@@ -295,7 +300,7 @@ const registrationColumns: Array<ColumnDef<RegistrationEntry>> = [
         >
           {row.original.contactEmail}
         </a>
-        {row.original.notifSent && (
+        {row.original.bill?.sent && (
           <Badge variant="outline">
             <MailCheckIcon />
           </Badge>
@@ -387,14 +392,14 @@ export const RegistrationDataTable = ({
   }
 
   const sample = registrations.at(0)
-  const isFinanceAvailable = sample?.pricePaid !== undefined
+  const isFinanceAvailable = sample?.priceToPay !== undefined
   const hasContact = !!sample?.contactName
 
   const columnVisibility: VisibilityState = {
     isRegistered: isDetailView,
-    pricePaid: isDetailView && isFinanceAvailable,
     priceToPay: isDetailView && isFinanceAvailable,
-    billId: isDetailView && isFinanceAvailable,
+    billNr: isDetailView && isFinanceAvailable,
+    billStatus: isDetailView && isFinanceAvailable,
     contactName: hasContact,
     contactEmail: hasContact,
   }
