@@ -6,6 +6,7 @@ import { toast } from 'sonner'
 import { Route as homeRoute } from '../routes/_auth/index.tsx'
 import { Route as registrationsRoute } from '../routes/_auth/nimekiri.tsx'
 import { Route as billsRoute } from '../routes/_auth/arved.tsx'
+import { Route as paymentsRoute } from '../routes/_auth/maksed.tsx'
 import { Route as permissionsRoute } from '../routes/_auth/oigused.tsx'
 import { Route as tentsRoute } from '../routes/_auth/telgid.index.tsx'
 import { Route as teamsRoute } from '../routes/_auth/meeskonnad.tsx'
@@ -62,11 +63,14 @@ const shiftItems = [
   },
 ]
 
-const adminItems: Array<{
+type RestrictedItem = {
   title: string
   url: string
   adminOnly?: boolean
-}> = [
+  rootOnly?: boolean
+}
+
+const registrationItems: Array<RestrictedItem> = [
   {
     title: 'Nimekiri',
     url: registrationsRoute.to,
@@ -76,6 +80,14 @@ const adminItems: Array<{
     url: billsRoute.to,
     adminOnly: true,
   },
+  {
+    title: 'Maksed',
+    url: paymentsRoute.to,
+    rootOnly: true,
+  },
+]
+
+const adminItems: Array<RestrictedItem> = [
   {
     title: 'T-särgid',
     url: shirtsRoute.to,
@@ -95,6 +107,11 @@ const adminItems: Array<{
     url: emailsRoute.to,
     adminOnly: true,
   },
+]
+
+const restrictedGroups = [
+  { id: 'registrations', items: registrationItems },
+  { id: 'admin', items: adminItems },
 ]
 
 const ShiftSwitcher = () => {
@@ -168,7 +185,7 @@ const ShiftSwitcher = () => {
 }
 
 export function AppSidebar() {
-  const currentRole = useUser().currentRole
+  const { currentRole, isRoot } = useUser()
   const isAdmin = isAdminRole(currentRole)
 
   return (
@@ -209,22 +226,25 @@ export function AppSidebar() {
             ))}
           </SidebarGroupContent>
         </SidebarGroup>
-        <SidebarGroup>
-          <SidebarGroupContent>
-            {adminItems.map((item) => {
-              if (item.adminOnly && !isAdmin) return null
-              return (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
-                    <Link to={item.url}>
-                      <span>{item.title}</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              )
-            })}
-          </SidebarGroupContent>
-        </SidebarGroup>
+        {restrictedGroups.map(({ id, items }) => (
+          <SidebarGroup key={id}>
+            <SidebarGroupContent>
+              {items.map((item) => {
+                if (item.adminOnly && !isAdmin) return null
+                if (item.rootOnly && !isRoot) return null
+                return (
+                  <SidebarMenuItem key={item.title}>
+                    <SidebarMenuButton asChild>
+                      <Link to={item.url}>
+                        <span>{item.title}</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                )
+              })}
+            </SidebarGroupContent>
+          </SidebarGroup>
+        ))}
       </SidebarContent>
       <SidebarFooter>
         <ShiftSwitcher />

@@ -18,6 +18,7 @@ import { Route as SignupRouteImport } from './routes/signup'
 import { Route as AuthIndexRouteImport } from './routes/_auth/index'
 import { Route as AuthArvedRouteImport } from './routes/_auth/arved'
 import { Route as AuthHindedRouteImport } from './routes/_auth/hinded'
+import { Route as AuthMaksedRouteImport } from './routes/_auth/maksed'
 import { Route as AuthMeeskonnadRouteImport } from './routes/_auth/meeskonnad'
 import { Route as AuthMeilidRouteImport } from './routes/_auth/meilid'
 import { Route as AuthNimekiriRouteImport } from './routes/_auth/nimekiri'
@@ -71,6 +72,11 @@ const AuthArvedRoute = AuthArvedRouteImport.update({
 const AuthHindedRoute = AuthHindedRouteImport.update({
   id: '/hinded',
   path: '/hinded',
+  getParentRoute: () => AuthRouteRoute,
+} as any)
+const AuthMaksedRoute = AuthMaksedRouteImport.update({
+  id: '/maksed',
+  path: '/maksed',
   getParentRoute: () => AuthRouteRoute,
 } as any)
 const AuthMeeskonnadRoute = AuthMeeskonnadRouteImport.update({
@@ -133,6 +139,7 @@ export interface FileRoutesByFullPath {
   '/signup': typeof SignupRoute
   '/arved': typeof AuthArvedRoute
   '/hinded': typeof AuthHindedRoute
+  '/maksed': typeof AuthMaksedRoute
   '/meeskonnad': typeof AuthMeeskonnadRoute
   '/meilid': typeof AuthMeilidRoute
   '/nimekiri': typeof AuthNimekiriRouteWithChildren
@@ -152,6 +159,7 @@ export interface FileRoutesByTo {
   '/signup': typeof SignupRoute
   '/arved': typeof AuthArvedRoute
   '/hinded': typeof AuthHindedRoute
+  '/maksed': typeof AuthMaksedRoute
   '/meeskonnad': typeof AuthMeeskonnadRoute
   '/meilid': typeof AuthMeilidRoute
   '/nimekiri': typeof AuthNimekiriRouteWithChildren
@@ -174,6 +182,7 @@ export interface FileRoutesById {
   '/signup': typeof SignupRoute
   '/_auth/arved': typeof AuthArvedRoute
   '/_auth/hinded': typeof AuthHindedRoute
+  '/_auth/maksed': typeof AuthMaksedRoute
   '/_auth/meeskonnad': typeof AuthMeeskonnadRoute
   '/_auth/meilid': typeof AuthMeilidRoute
   '/_auth/nimekiri': typeof AuthNimekiriRouteWithChildren
@@ -197,6 +206,7 @@ export interface FileRouteTypes {
     | '/signup'
     | '/arved'
     | '/hinded'
+    | '/maksed'
     | '/meeskonnad'
     | '/meilid'
     | '/nimekiri'
@@ -216,6 +226,7 @@ export interface FileRouteTypes {
     | '/signup'
     | '/arved'
     | '/hinded'
+    | '/maksed'
     | '/meeskonnad'
     | '/meilid'
     | '/nimekiri'
@@ -237,6 +248,7 @@ export interface FileRouteTypes {
     | '/signup'
     | '/_auth/arved'
     | '/_auth/hinded'
+    | '/_auth/maksed'
     | '/_auth/meeskonnad'
     | '/_auth/meilid'
     | '/_auth/nimekiri'
@@ -322,6 +334,13 @@ declare module '@tanstack/react-router' {
       path: '/hinded'
       fullPath: '/hinded'
       preLoaderRoute: typeof AuthHindedRouteImport
+      parentRoute: typeof AuthRouteRoute
+    }
+    '/_auth/maksed': {
+      id: '/_auth/maksed'
+      path: '/maksed'
+      fullPath: '/maksed'
+      preLoaderRoute: typeof AuthMaksedRouteImport
       parentRoute: typeof AuthRouteRoute
     }
     '/_auth/meeskonnad': {
@@ -412,6 +431,7 @@ const AuthNimekiriRouteWithChildren = AuthNimekiriRoute._addFileChildren(
 interface AuthRouteRouteChildren {
   AuthArvedRoute: typeof AuthArvedRoute
   AuthHindedRoute: typeof AuthHindedRoute
+  AuthMaksedRoute: typeof AuthMaksedRoute
   AuthMeeskonnadRoute: typeof AuthMeeskonnadRoute
   AuthMeilidRoute: typeof AuthMeilidRoute
   AuthNimekiriRoute: typeof AuthNimekiriRouteWithChildren
@@ -427,6 +447,7 @@ interface AuthRouteRouteChildren {
 const AuthRouteRouteChildren: AuthRouteRouteChildren = {
   AuthArvedRoute: AuthArvedRoute,
   AuthHindedRoute: AuthHindedRoute,
+  AuthMaksedRoute: AuthMaksedRoute,
   AuthMeeskonnadRoute: AuthMeeskonnadRoute,
   AuthMeilidRoute: AuthMeilidRoute,
   AuthNimekiriRoute: AuthNimekiriRouteWithChildren,

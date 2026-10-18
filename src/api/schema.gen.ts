@@ -939,6 +939,86 @@ export interface paths {
         };
         trace?: never;
     };
+    "/api/payments/accounts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @enum {string} */
+                            status: "success";
+                            data: {
+                                accounts: {
+                                    reference: string;
+                                    name: string;
+                                    email: string;
+                                    billedCents: number;
+                                    paidCents: number;
+                                    /** Format: date-time */
+                                    paymentsUpdatedAt: string | null;
+                                    bills: {
+                                        number: number;
+                                        status: "paid" | "open" | "booking-fee-overdue" | "camp-fee-overdue" | "void";
+                                        sent: boolean;
+                                        paidCents: number;
+                                        totalCents: number;
+                                        /** Format: date-time */
+                                        issuedAt: string;
+                                        shiftNrs: number[];
+                                    }[];
+                                    payments: {
+                                        id: number;
+                                        amountCents: number;
+                                        /** Format: date-time */
+                                        createdAt: string;
+                                    }[];
+                                }[];
+                            } | null;
+                        };
+                    };
+                };
+                /** @description Default Response */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @enum {string} */
+                            status: "fail";
+                            data: {
+                                permissions: string;
+                            };
+                        };
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/payments/": {
         parameters: {
             query?: never;

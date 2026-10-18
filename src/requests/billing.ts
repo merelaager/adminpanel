@@ -71,6 +71,22 @@ export const fetchShiftBilling = async (shiftNr: number) => {
   return unwrapData(data).records
 }
 
+export type PayerAccount = SuccessData<
+  paths['/api/payments/accounts']['get']
+>['accounts'][number]
+
+export const fetchPayerAccounts = async () => {
+  const { data, error, response } = await client.GET('/api/payments/accounts')
+  if (error !== undefined) throw toApiError(response.status, error)
+  return unwrapData(data).accounts
+}
+
+export const payerAccountsQueryOptions = () =>
+  queryOptions({
+    queryKey: ['billing', 'accounts'],
+    queryFn: fetchPayerAccounts,
+  })
+
 export const shiftBillingFetchQueryOptions = (shiftNr: number) =>
   queryOptions({
     queryKey: ['billing', shiftNr],

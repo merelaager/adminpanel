@@ -15,11 +15,9 @@ import type {
 } from '@/requests/billing.ts'
 import { requireUser, useUser } from '@/stores/authStore.ts'
 import { requireAdmin } from '@/lib/roles.ts'
-import { openBlobInNewTab } from '@/lib/blob.ts'
 import { formatCents } from '@/lib/money.ts'
 
 import {
-  fetchBillPdf,
   invalidateBillingQueries,
   sendBill,
   shiftBillingFetchQueryOptions,
@@ -35,10 +33,10 @@ import {
   DrawerTrigger,
 } from '@/components/ui/drawer.tsx'
 
+import { BillChip } from '@/components/BillChip.tsx'
 import { BillStatusBadge } from '@/components/BillStatusBadge.tsx'
 import { DataTable } from '@/components/data-table.tsx'
 import { RecordPaymentDialog } from '@/components/RecordPaymentDialog.tsx'
-import { ReissueBillButton } from '@/components/ReissueBillButton.tsx'
 
 export const Route = createFileRoute('/_auth/arved')({
   component: RouteComponent,
@@ -219,40 +217,6 @@ const ParentActions = ({ parent }: { parent: ParentBillData }) => {
           reference={parent.reference}
           payerName={parent.name}
         />
-      )}
-    </div>
-  )
-}
-
-const BillChip = ({ bill }: { bill: BillSummary }) => {
-  const openPdf = async () => {
-    let pdfBlob: Blob
-    try {
-      pdfBlob = await fetchBillPdf(bill.number)
-    } catch (err: unknown) {
-      toast.warning('Viga arve pärimisel!', {
-        description: (err as Error).message,
-      })
-      return
-    }
-    openBlobInNewTab(pdfBlob)
-  }
-
-  const { isRoot } = useUser()
-
-  return (
-    <div className="flex items-center">
-      <Button
-        variant="outline"
-        size="sm"
-        onClick={openPdf}
-        title={bill.sent ? 'Saadetud. Ava PDF' : 'Saatmata. Ava PDF'}
-      >
-        <span className="font-mono">{bill.number}</span>
-        <BillStatusBadge status={bill.status} />
-      </Button>
-      {isRoot && bill.status !== 'void' && (
-        <ReissueBillButton billNr={bill.number} />
       )}
     </div>
   )
