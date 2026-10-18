@@ -7,16 +7,19 @@ import {
 import { toast } from 'sonner'
 
 import { ArrowUpDown } from 'lucide-react'
-import type { ColumnDef } from '@tanstack/table-core'
-import type { ChildBillData, ParentBillData } from '@/requests/billing.ts'
+import type { Column, ColumnDef } from '@tanstack/table-core'
+import type {
+  BillSummary,
+  ChildBillData,
+  ParentBillData,
+} from '@/requests/billing.ts'
 import { requireUser, useUser } from '@/stores/authStore.ts'
-import { updateListItem } from '@/lib/query-cache.ts'
 import { requireAdmin } from '@/lib/roles.ts'
 import { openBlobInNewTab } from '@/lib/blob.ts'
+import { formatCents } from '@/lib/money.ts'
 
 import {
   fetchBillPdf,
-  generateBill,
   sendBill,
   shiftBillingFetchQueryOptions,
 } from '@/requests/billing.ts'
@@ -30,9 +33,8 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from '@/components/ui/drawer.tsx'
-import { Tooltip, TooltipContent } from '@/components/ui/tooltip'
-import { TooltipTrigger } from '@/components/ui/tooltip.tsx'
 
+import { BillStatusBadge } from '@/components/BillStatusBadge.tsx'
 import { DataTable } from '@/components/data-table.tsx'
 
 export const Route = createFileRoute('/_auth/arved')({
@@ -44,6 +46,51 @@ export const Route = createFileRoute('/_auth/arved')({
   },
 })
 
+type ParentSummary = {
+  bills: Array<BillSummary>
+  unbilledCount: number
+  paidCents: number
+  totalCents: number
+  hasSomethingToSend: boolean
+}
+
+const summarizeParent = (parent: ParentBillData): ParentSummary => {
+  const bills = new Map<number, BillSummary>()
+  let unbilledCount = 0
+  for (const record of parent.records) {
+    if (record.bill) bills.set(record.bill.number, record.bill)
+    else unbilledCount++
+  }
+
+  const sortedBills = [...bills.values()].sort((a, b) => a.number - b.number)
+  const activeBills = sortedBills.filter((bill) => bill.status !== 'void')
+
+  return {
+    bills: sortedBills,
+    unbilledCount,
+    paidCents: activeBills.reduce((sum, bill) => sum + bill.paidCents, 0),
+    totalCents: activeBills.reduce((sum, bill) => sum + bill.totalCents, 0),
+    hasSomethingToSend:
+      unbilledCount > 0 || activeBills.some((bill) => !bill.sent),
+  }
+}
+
+const SortableHeader = <T,>({
+  column,
+  title,
+}: {
+  column: Column<T>
+  title: string
+}) => (
+  <Button
+    variant="ghost"
+    onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+  >
+    {title}
+    <ArrowUpDown className="ml-2 h-4 w-4" />
+  </Button>
+)
+
 const childrenTableColumns: Array<ColumnDef<ChildBillData>> = [
   {
     accessorKey: 'childName',
@@ -54,19 +101,23 @@ const childrenTableColumns: Array<ColumnDef<ChildBillData>> = [
     header: 'Vahetus',
   },
   {
-    accessorKey: 'pricePaid',
-    header: 'Makstud',
-  },
-  {
     accessorKey: 'priceToPay',
-    header: 'Maksta',
+    header: 'Hind',
+    cell: ({ row }) => `${row.original.priceToPay} €`,
   },
   {
-    accessorKey: 'billSent',
-    header: 'Arve saadetud?',
+    id: 'billNr',
+    header: 'Arve nr',
+    cell: ({ row }) => (
+      <span className="font-mono">{row.original.bill?.number ?? '–'}</span>
+    ),
+  },
+  {
+    id: 'billStatus',
+    header: 'Arve seis',
     cell: ({ row }) => {
-      const billSent = row.original.billSent
-      return billSent ? 'Jah' : 'Ei'
+      const bill = row.original.bill
+      return bill ? <BillStatusBadge status={bill.status} /> : 'Arveta'
     },
   },
 ]
@@ -74,203 +125,148 @@ const childrenTableColumns: Array<ColumnDef<ChildBillData>> = [
 const billTableColumns: Array<ColumnDef<ParentBillData>> = [
   {
     accessorKey: 'name',
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-        >
-          Nimi
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
-      )
-    },
-  },
-  {
-    header: 'Makstud',
+    header: ({ column }) => <SortableHeader column={column} title="Nimi" />,
     cell: ({ row }) => {
-      let pricePaid = 0
-      row.original.records.forEach((record) => {
-        pricePaid += record.pricePaid
-      })
-      return pricePaid
-    },
-  },
-  {
-    header: 'Maksta',
-    cell: ({ row }) => {
-      let priceToPay = 0
-      row.original.records.forEach((record) => {
-        priceToPay += record.priceToPay
-      })
-      return priceToPay
-    },
-  },
-  {
-    accessorKey: 'billNr',
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-        >
-          Arve nr
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
-      )
-    },
-    cell: ({ row }) => {
-      const billNr = row.original.billNr
       const records = [...row.original.records].sort((a, b) =>
         a.childName.localeCompare(b.childName),
       )
-
-      let billSent = true
-      records.forEach((record) => {
-        if (!record.billSent) billSent = false
-      })
-
       return (
-        <div className="flex justify-between items-center gap-2">
-          <Drawer>
-            <DrawerTrigger asChild>
-              <span className="cursor-pointer hover:underline">
-                {billNr || '-'}
+        <Drawer>
+          <DrawerTrigger asChild>
+            <button
+              type="button"
+              className="flex flex-col items-start text-left cursor-pointer hover:underline"
+            >
+              <span>{row.original.name}</span>
+              <span className="text-sm text-muted-foreground">
+                {row.original.email}
               </span>
-            </DrawerTrigger>
-            <DrawerContent className="mx-auto w-auto">
-              <div className="px-24 pb-24">
-                <DrawerHeader>
-                  <DrawerTitle>
-                    Arve {billNr || 'pole veel genereeritud'}
-                  </DrawerTitle>
-                  <DrawerDescription>{row.original.email}</DrawerDescription>
-                </DrawerHeader>
-                <DataTable columns={childrenTableColumns} data={records} />
-              </div>
-            </DrawerContent>
-          </Drawer>
-          <div>
-            <GenerateBillButton email={row.original.email} />
-            <PrintBillButton billNr={billNr} />
-            <SendBillButton
-              name={row.original.name}
-              email={row.original.email}
-              billSent={billSent}
-            />
-          </div>
+            </button>
+          </DrawerTrigger>
+          <DrawerContent className="mx-auto w-auto">
+            <div className="px-24 pb-24">
+              <DrawerHeader>
+                <DrawerTitle>{row.original.name}</DrawerTitle>
+                <DrawerDescription>{row.original.email}</DrawerDescription>
+              </DrawerHeader>
+              <DataTable columns={childrenTableColumns} data={records} />
+            </div>
+          </DrawerContent>
+        </Drawer>
+      )
+    },
+  },
+  {
+    id: 'bills',
+    accessorFn: (row) => summarizeParent(row).bills.at(0)?.number ?? 0,
+    header: ({ column }) => <SortableHeader column={column} title="Arved" />,
+    cell: ({ row }) => {
+      const { bills, unbilledCount } = summarizeParent(row.original)
+      return (
+        <div className="flex flex-wrap items-center gap-2">
+          {bills.map((bill) => (
+            <BillChip key={bill.number} bill={bill} />
+          ))}
+          {unbilledCount > 0 && (
+            <span className="text-sm text-muted-foreground">
+              {unbilledCount} {unbilledCount === 1 ? 'laps' : 'last'} arveta
+            </span>
+          )}
         </div>
       )
     },
   },
-]
-
-const GenerateBillButton = ({ email }: { email: string }) => {
-  const mutation = useMutation({
-    mutationFn: (targetEmail: string) => {
-      return generateBill(targetEmail)
-    },
-    onError: (error: Error) => {
-      toast.error('Viga arve genereerimisel!', {
-        description: error.message,
-      })
-    },
-  })
-
-  const onClick = () => {
-    mutation.mutate(email)
-  }
-
-  return (
-    <Tooltip>
-      <TooltipTrigger asChild>
-        <Button variant="outline" className="mr-2" onClick={onClick}>
-          Genereeri
-        </Button>
-      </TooltipTrigger>
-      <TooltipContent>
-        <p>Genereerib uue arve.</p>
-      </TooltipContent>
-    </Tooltip>
-  )
-}
-
-const SendBillButton = ({
-  name,
-  email,
-  billSent,
-}: {
-  name: string
-  email: string
-  billSent: boolean
-}) => {
-  const queryClient = useQueryClient()
-  const shiftNr = useUser().currentShift
-
-  const mutation = useMutation({
-    mutationFn: async (targetEmail: string) => {
-      await sendBill(targetEmail)
-      return targetEmail
-    },
-    onError: (error: Error) => {
-      toast.error('Viga arve saatmisel!', {
-        description: error.message,
-      })
-    },
-    onSuccess: (sentEmail) => {
-      toast.success('Arve edukalt saadetud.', {
-        description: `Saaja: ${name} (${sentEmail})`,
-      })
-
-      updateListItem<ParentBillData>(
-        queryClient,
-        shiftBillingFetchQueryOptions(shiftNr).queryKey,
-        (r) => r.email === sentEmail,
-        (r) => ({
-          ...r,
-          records: r.records.map((record) => ({ ...record, billSent: true })),
-        }),
+  {
+    id: 'paid',
+    header: 'Makstud',
+    cell: ({ row }) => {
+      const { bills, paidCents, totalCents } = summarizeParent(row.original)
+      if (bills.length === 0) return '–'
+      return (
+        <span className="font-mono whitespace-nowrap">
+          {formatCents(paidCents)} / {formatCents(totalCents)}
+        </span>
       )
     },
-  })
+  },
+  {
+    id: 'actions',
+    cell: ({ row }) => (
+      <SendBillButton
+        name={row.original.name}
+        email={row.original.email}
+        hasSomethingToSend={summarizeParent(row.original).hasSomethingToSend}
+      />
+    ),
+  },
+]
 
-  const onClick = () => {
-    mutation.mutate(email)
-  }
-
-  return (
-    <Button variant="outline" disabled={billSent} onClick={onClick}>
-      Saada arve
-    </Button>
-  )
-}
-
-const PrintBillButton = ({ billNr }: { billNr: number | null }) => {
-  const print = async () => {
-    if (billNr === null) return
-
+const BillChip = ({ bill }: { bill: BillSummary }) => {
+  const openPdf = async () => {
     let pdfBlob: Blob
-
     try {
-      pdfBlob = await fetchBillPdf(billNr)
+      pdfBlob = await fetchBillPdf(bill.number)
     } catch (err: unknown) {
       toast.warning('Viga arve pärimisel!', {
         description: (err as Error).message,
       })
       return
     }
-
     openBlobInNewTab(pdfBlob)
   }
 
   return (
     <Button
       variant="outline"
-      className="mr-2"
-      disabled={!billNr}
-      onClick={print}
+      size="sm"
+      onClick={openPdf}
+      title={bill.sent ? 'Saadetud. Ava PDF' : 'Saatmata. Ava PDF'}
     >
-      Kuva PDF
+      <span className="font-mono">{bill.number}</span>
+      <BillStatusBadge status={bill.status} />
+    </Button>
+  )
+}
+
+const SendBillButton = ({
+  name,
+  email,
+  hasSomethingToSend,
+}: {
+  name: string
+  email: string
+  hasSomethingToSend: boolean
+}) => {
+  const queryClient = useQueryClient()
+
+  const mutation = useMutation({
+    mutationFn: () => sendBill(email),
+    onError: (error: Error) => {
+      toast.error('Viga arve saatmisel!', {
+        description: error.message,
+      })
+    },
+    onSuccess: (billNrs) => {
+      const title =
+        billNrs.length === 1
+          ? `Arve ${billNrs[0]} saadetud.`
+          : `Arved ${billNrs.join(', ')} saadetud.`
+      toast.success(title, { description: `Saaja: ${name} (${email})` })
+    },
+    onSettled: () =>
+      Promise.all([
+        queryClient.invalidateQueries({ queryKey: ['billing'] }),
+        queryClient.invalidateQueries({ queryKey: ['registrations'] }),
+      ]),
+  })
+
+  return (
+    <Button
+      variant="outline"
+      disabled={!hasSomethingToSend || mutation.isPending}
+      onClick={() => mutation.mutate()}
+    >
+      Saada arve
     </Button>
   )
 }

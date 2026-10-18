@@ -876,12 +876,18 @@ export interface paths {
             };
             responses: {
                 /** @description Default Response */
-                204: {
+                200: {
                     headers: {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": unknown;
+                        "application/json": {
+                            /** @enum {string} */
+                            status: "success";
+                            data: {
+                                billNrs: number[];
+                            } | null;
+                        };
                     };
                 };
                 /** @description Default Response */

@@ -66,6 +66,7 @@ import {
   TableRow,
 } from '@/components/ui/table.tsx'
 
+import { BillStatusBadge } from '@/components/BillStatusBadge.tsx'
 import { ChildCounter } from '@/components/ChildCounter.tsx'
 import { ChildRecordsSheet } from '@/components/ChildRecordsSheet.tsx'
 import { ShiftNav } from '@/components/ShiftMenu.tsx'
@@ -270,15 +271,7 @@ const registrationColumns: Array<ColumnDef<RegistrationEntry>> = [
     },
     cell: ({ row }) => {
       const bill = row.original.bill
-      if (!bill) return null
-      const isOverdue =
-        bill.status === 'booking-fee-overdue' ||
-        bill.status === 'camp-fee-overdue'
-      return (
-        <Badge variant={isOverdue ? 'destructive' : 'outline'}>
-          {billStatusLabels[bill.status]}
-        </Badge>
-      )
+      return bill ? <BillStatusBadge status={bill.status} /> : null
     },
   },
   {

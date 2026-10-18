@@ -24,17 +24,14 @@ export const billStatusLabels: Record<BillStatus, string> = {
 }
 
 export const sendBill = async (email: string) => {
-  const { error, response } = await client.POST('/api/notifications/bills', {
-    body: { email },
-  })
+  const { data, error, response } = await client.POST(
+    '/api/notifications/bills',
+    {
+      body: { email },
+    },
+  )
   if (error !== undefined) throw toApiError(response.status, error)
-}
-
-export const generateBill = async (email: string) => {
-  const { error, response } = await client.POST('/api/bills/', {
-    body: { email },
-  })
-  if (error !== undefined) throw toApiError(response.status, error)
+  return unwrapData(data).billNrs
 }
 
 export const fetchBillPdf = async (billNr: number) => {
