@@ -9,44 +9,28 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as SignupRouteImport } from './routes/signup'
-import { Route as PrivaatsustingimusedRouteImport } from './routes/privaatsustingimused'
-import { Route as PasswordResetRouteImport } from './routes/password-reset'
-import { Route as LoginRouteImport } from './routes/login'
-import { Route as KontaktRouteImport } from './routes/kontakt'
 import { Route as AuthRouteRouteImport } from './routes/_auth/route'
+import { Route as KontaktRouteImport } from './routes/kontakt'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as PasswordResetRouteImport } from './routes/password-reset'
+import { Route as PrivaatsustingimusedRouteImport } from './routes/privaatsustingimused'
+import { Route as SignupRouteImport } from './routes/signup'
 import { Route as AuthIndexRouteImport } from './routes/_auth/index'
-import { Route as AuthTaimerRouteImport } from './routes/_auth/taimer'
-import { Route as AuthStatistikaRouteImport } from './routes/_auth/statistika'
-import { Route as AuthSargidRouteImport } from './routes/_auth/sargid'
-import { Route as AuthOigusedRouteImport } from './routes/_auth/oigused'
-import { Route as AuthNimekiriRouteImport } from './routes/_auth/nimekiri'
-import { Route as AuthMeilidRouteImport } from './routes/_auth/meilid'
-import { Route as AuthMeeskonnadRouteImport } from './routes/_auth/meeskonnad'
-import { Route as AuthHindedRouteImport } from './routes/_auth/hinded'
 import { Route as AuthArvedRouteImport } from './routes/_auth/arved'
+import { Route as AuthHindedRouteImport } from './routes/_auth/hinded'
+import { Route as AuthMeeskonnadRouteImport } from './routes/_auth/meeskonnad'
+import { Route as AuthMeilidRouteImport } from './routes/_auth/meilid'
+import { Route as AuthNimekiriRouteImport } from './routes/_auth/nimekiri'
+import { Route as AuthOigusedRouteImport } from './routes/_auth/oigused'
+import { Route as AuthSargidRouteImport } from './routes/_auth/sargid'
+import { Route as AuthStatistikaRouteImport } from './routes/_auth/statistika'
+import { Route as AuthTaimerRouteImport } from './routes/_auth/taimer'
+import { Route as AuthNimekiriShiftNrRouteImport } from './routes/_auth/nimekiri.$shiftNr'
 import { Route as AuthTelgidIndexRouteImport } from './routes/_auth/telgid.index'
 import { Route as AuthTelgidTentNrRouteImport } from './routes/_auth/telgid.$tentNr'
-import { Route as AuthNimekiriShiftNrRouteImport } from './routes/_auth/nimekiri.$shiftNr'
 
-const SignupRoute = SignupRouteImport.update({
-  id: '/signup',
-  path: '/signup',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PrivaatsustingimusedRoute = PrivaatsustingimusedRouteImport.update({
-  id: '/privaatsustingimused',
-  path: '/privaatsustingimused',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PasswordResetRoute = PasswordResetRouteImport.update({
-  id: '/password-reset',
-  path: '/password-reset',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const LoginRoute = LoginRouteImport.update({
-  id: '/login',
-  path: '/login',
+const AuthRouteRoute = AuthRouteRouteImport.update({
+  id: '/_auth',
   getParentRoute: () => rootRouteImport,
 } as any)
 const KontaktRoute = KontaktRouteImport.update({
@@ -54,8 +38,24 @@ const KontaktRoute = KontaktRouteImport.update({
   path: '/kontakt',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthRouteRoute = AuthRouteRouteImport.update({
-  id: '/_auth',
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PasswordResetRoute = PasswordResetRouteImport.update({
+  id: '/password-reset',
+  path: '/password-reset',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivaatsustingimusedRoute = PrivaatsustingimusedRouteImport.update({
+  id: '/privaatsustingimused',
+  path: '/privaatsustingimused',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SignupRoute = SignupRouteImport.update({
+  id: '/signup',
+  path: '/signup',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthIndexRoute = AuthIndexRouteImport.update({
@@ -63,39 +63,9 @@ const AuthIndexRoute = AuthIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AuthRouteRoute,
 } as any)
-const AuthTaimerRoute = AuthTaimerRouteImport.update({
-  id: '/taimer',
-  path: '/taimer',
-  getParentRoute: () => AuthRouteRoute,
-} as any)
-const AuthStatistikaRoute = AuthStatistikaRouteImport.update({
-  id: '/statistika',
-  path: '/statistika',
-  getParentRoute: () => AuthRouteRoute,
-} as any)
-const AuthSargidRoute = AuthSargidRouteImport.update({
-  id: '/sargid',
-  path: '/sargid',
-  getParentRoute: () => AuthRouteRoute,
-} as any)
-const AuthOigusedRoute = AuthOigusedRouteImport.update({
-  id: '/oigused',
-  path: '/oigused',
-  getParentRoute: () => AuthRouteRoute,
-} as any)
-const AuthNimekiriRoute = AuthNimekiriRouteImport.update({
-  id: '/nimekiri',
-  path: '/nimekiri',
-  getParentRoute: () => AuthRouteRoute,
-} as any)
-const AuthMeilidRoute = AuthMeilidRouteImport.update({
-  id: '/meilid',
-  path: '/meilid',
-  getParentRoute: () => AuthRouteRoute,
-} as any)
-const AuthMeeskonnadRoute = AuthMeeskonnadRouteImport.update({
-  id: '/meeskonnad',
-  path: '/meeskonnad',
+const AuthArvedRoute = AuthArvedRouteImport.update({
+  id: '/arved',
+  path: '/arved',
   getParentRoute: () => AuthRouteRoute,
 } as any)
 const AuthHindedRoute = AuthHindedRouteImport.update({
@@ -103,10 +73,45 @@ const AuthHindedRoute = AuthHindedRouteImport.update({
   path: '/hinded',
   getParentRoute: () => AuthRouteRoute,
 } as any)
-const AuthArvedRoute = AuthArvedRouteImport.update({
-  id: '/arved',
-  path: '/arved',
+const AuthMeeskonnadRoute = AuthMeeskonnadRouteImport.update({
+  id: '/meeskonnad',
+  path: '/meeskonnad',
   getParentRoute: () => AuthRouteRoute,
+} as any)
+const AuthMeilidRoute = AuthMeilidRouteImport.update({
+  id: '/meilid',
+  path: '/meilid',
+  getParentRoute: () => AuthRouteRoute,
+} as any)
+const AuthNimekiriRoute = AuthNimekiriRouteImport.update({
+  id: '/nimekiri',
+  path: '/nimekiri',
+  getParentRoute: () => AuthRouteRoute,
+} as any)
+const AuthOigusedRoute = AuthOigusedRouteImport.update({
+  id: '/oigused',
+  path: '/oigused',
+  getParentRoute: () => AuthRouteRoute,
+} as any)
+const AuthSargidRoute = AuthSargidRouteImport.update({
+  id: '/sargid',
+  path: '/sargid',
+  getParentRoute: () => AuthRouteRoute,
+} as any)
+const AuthStatistikaRoute = AuthStatistikaRouteImport.update({
+  id: '/statistika',
+  path: '/statistika',
+  getParentRoute: () => AuthRouteRoute,
+} as any)
+const AuthTaimerRoute = AuthTaimerRouteImport.update({
+  id: '/taimer',
+  path: '/taimer',
+  getParentRoute: () => AuthRouteRoute,
+} as any)
+const AuthNimekiriShiftNrRoute = AuthNimekiriShiftNrRouteImport.update({
+  id: '/$shiftNr',
+  path: '/$shiftNr',
+  getParentRoute: () => AuthNimekiriRoute,
 } as any)
 const AuthTelgidIndexRoute = AuthTelgidIndexRouteImport.update({
   id: '/telgid/',
@@ -117,11 +122,6 @@ const AuthTelgidTentNrRoute = AuthTelgidTentNrRouteImport.update({
   id: '/telgid/$tentNr',
   path: '/telgid/$tentNr',
   getParentRoute: () => AuthRouteRoute,
-} as any)
-const AuthNimekiriShiftNrRoute = AuthNimekiriShiftNrRouteImport.update({
-  id: '/$shiftNr',
-  path: '/$shiftNr',
-  getParentRoute: () => AuthNimekiriRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
@@ -261,32 +261,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/signup': {
-      id: '/signup'
-      path: '/signup'
-      fullPath: '/signup'
-      preLoaderRoute: typeof SignupRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/privaatsustingimused': {
-      id: '/privaatsustingimused'
-      path: '/privaatsustingimused'
-      fullPath: '/privaatsustingimused'
-      preLoaderRoute: typeof PrivaatsustingimusedRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/password-reset': {
-      id: '/password-reset'
-      path: '/password-reset'
-      fullPath: '/password-reset'
-      preLoaderRoute: typeof PasswordResetRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/login': {
-      id: '/login'
-      path: '/login'
-      fullPath: '/login'
-      preLoaderRoute: typeof LoginRouteImport
+    '/_auth': {
+      id: '/_auth'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/kontakt': {
@@ -296,11 +275,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof KontaktRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_auth': {
-      id: '/_auth'
-      path: ''
-      fullPath: '/'
-      preLoaderRoute: typeof AuthRouteRouteImport
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/password-reset': {
+      id: '/password-reset'
+      path: '/password-reset'
+      fullPath: '/password-reset'
+      preLoaderRoute: typeof PasswordResetRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privaatsustingimused': {
+      id: '/privaatsustingimused'
+      path: '/privaatsustingimused'
+      fullPath: '/privaatsustingimused'
+      preLoaderRoute: typeof PrivaatsustingimusedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/signup': {
+      id: '/signup'
+      path: '/signup'
+      fullPath: '/signup'
+      preLoaderRoute: typeof SignupRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_auth/': {
@@ -310,53 +310,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthIndexRouteImport
       parentRoute: typeof AuthRouteRoute
     }
-    '/_auth/taimer': {
-      id: '/_auth/taimer'
-      path: '/taimer'
-      fullPath: '/taimer'
-      preLoaderRoute: typeof AuthTaimerRouteImport
-      parentRoute: typeof AuthRouteRoute
-    }
-    '/_auth/statistika': {
-      id: '/_auth/statistika'
-      path: '/statistika'
-      fullPath: '/statistika'
-      preLoaderRoute: typeof AuthStatistikaRouteImport
-      parentRoute: typeof AuthRouteRoute
-    }
-    '/_auth/sargid': {
-      id: '/_auth/sargid'
-      path: '/sargid'
-      fullPath: '/sargid'
-      preLoaderRoute: typeof AuthSargidRouteImport
-      parentRoute: typeof AuthRouteRoute
-    }
-    '/_auth/oigused': {
-      id: '/_auth/oigused'
-      path: '/oigused'
-      fullPath: '/oigused'
-      preLoaderRoute: typeof AuthOigusedRouteImport
-      parentRoute: typeof AuthRouteRoute
-    }
-    '/_auth/nimekiri': {
-      id: '/_auth/nimekiri'
-      path: '/nimekiri'
-      fullPath: '/nimekiri'
-      preLoaderRoute: typeof AuthNimekiriRouteImport
-      parentRoute: typeof AuthRouteRoute
-    }
-    '/_auth/meilid': {
-      id: '/_auth/meilid'
-      path: '/meilid'
-      fullPath: '/meilid'
-      preLoaderRoute: typeof AuthMeilidRouteImport
-      parentRoute: typeof AuthRouteRoute
-    }
-    '/_auth/meeskonnad': {
-      id: '/_auth/meeskonnad'
-      path: '/meeskonnad'
-      fullPath: '/meeskonnad'
-      preLoaderRoute: typeof AuthMeeskonnadRouteImport
+    '/_auth/arved': {
+      id: '/_auth/arved'
+      path: '/arved'
+      fullPath: '/arved'
+      preLoaderRoute: typeof AuthArvedRouteImport
       parentRoute: typeof AuthRouteRoute
     }
     '/_auth/hinded': {
@@ -366,12 +324,61 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthHindedRouteImport
       parentRoute: typeof AuthRouteRoute
     }
-    '/_auth/arved': {
-      id: '/_auth/arved'
-      path: '/arved'
-      fullPath: '/arved'
-      preLoaderRoute: typeof AuthArvedRouteImport
+    '/_auth/meeskonnad': {
+      id: '/_auth/meeskonnad'
+      path: '/meeskonnad'
+      fullPath: '/meeskonnad'
+      preLoaderRoute: typeof AuthMeeskonnadRouteImport
       parentRoute: typeof AuthRouteRoute
+    }
+    '/_auth/meilid': {
+      id: '/_auth/meilid'
+      path: '/meilid'
+      fullPath: '/meilid'
+      preLoaderRoute: typeof AuthMeilidRouteImport
+      parentRoute: typeof AuthRouteRoute
+    }
+    '/_auth/nimekiri': {
+      id: '/_auth/nimekiri'
+      path: '/nimekiri'
+      fullPath: '/nimekiri'
+      preLoaderRoute: typeof AuthNimekiriRouteImport
+      parentRoute: typeof AuthRouteRoute
+    }
+    '/_auth/oigused': {
+      id: '/_auth/oigused'
+      path: '/oigused'
+      fullPath: '/oigused'
+      preLoaderRoute: typeof AuthOigusedRouteImport
+      parentRoute: typeof AuthRouteRoute
+    }
+    '/_auth/sargid': {
+      id: '/_auth/sargid'
+      path: '/sargid'
+      fullPath: '/sargid'
+      preLoaderRoute: typeof AuthSargidRouteImport
+      parentRoute: typeof AuthRouteRoute
+    }
+    '/_auth/statistika': {
+      id: '/_auth/statistika'
+      path: '/statistika'
+      fullPath: '/statistika'
+      preLoaderRoute: typeof AuthStatistikaRouteImport
+      parentRoute: typeof AuthRouteRoute
+    }
+    '/_auth/taimer': {
+      id: '/_auth/taimer'
+      path: '/taimer'
+      fullPath: '/taimer'
+      preLoaderRoute: typeof AuthTaimerRouteImport
+      parentRoute: typeof AuthRouteRoute
+    }
+    '/_auth/nimekiri/$shiftNr': {
+      id: '/_auth/nimekiri/$shiftNr'
+      path: '/$shiftNr'
+      fullPath: '/nimekiri/$shiftNr'
+      preLoaderRoute: typeof AuthNimekiriShiftNrRouteImport
+      parentRoute: typeof AuthNimekiriRoute
     }
     '/_auth/telgid/': {
       id: '/_auth/telgid/'
@@ -386,13 +393,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/telgid/$tentNr'
       preLoaderRoute: typeof AuthTelgidTentNrRouteImport
       parentRoute: typeof AuthRouteRoute
-    }
-    '/_auth/nimekiri/$shiftNr': {
-      id: '/_auth/nimekiri/$shiftNr'
-      path: '/$shiftNr'
-      fullPath: '/nimekiri/$shiftNr'
-      preLoaderRoute: typeof AuthNimekiriShiftNrRouteImport
-      parentRoute: typeof AuthNimekiriRoute
     }
   }
 }
