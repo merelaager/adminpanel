@@ -15,6 +15,7 @@ import type {
 } from '@/requests/billing.ts'
 import { requireUser, useUser } from '@/stores/authStore.ts'
 import { requireAdmin } from '@/lib/roles.ts'
+import { formatDateTime } from '@/lib/date.ts'
 import { formatCents } from '@/lib/money.ts'
 
 import {
@@ -53,6 +54,7 @@ type ParentSummary = {
   paidCents: number
   totalCents: number
   hasSomethingToSend: boolean
+  paymentsUpdatedAt: string | null
 }
 
 const summarizeParent = (parent: ParentBillData): ParentSummary => {
@@ -73,6 +75,8 @@ const summarizeParent = (parent: ParentBillData): ParentSummary => {
     totalCents: activeBills.reduce((sum, bill) => sum + bill.totalCents, 0),
     hasSomethingToSend:
       unbilledCount > 0 || activeBills.some((bill) => !bill.sent),
+    // All of a parent's bills belong to one account, so they share this time.
+    paymentsUpdatedAt: sortedBills.at(0)?.paymentsUpdatedAt ?? null,
   }
 }
 
@@ -148,7 +152,18 @@ const billTableColumns: Array<ColumnDef<ParentBillData>> = [
             <div className="px-24 pb-24">
               <DrawerHeader>
                 <DrawerTitle>{row.original.name}</DrawerTitle>
-                <DrawerDescription>{row.original.email}</DrawerDescription>
+                <DrawerDescription>
+                  {row.original.email}
+                  {row.original.reference !== null && (
+                    <>
+                      {' '}
+                      · viitenumber{' '}
+                      <span className="font-mono">
+                        {row.original.reference}
+                      </span>
+                    </>
+                  )}
+                </DrawerDescription>
               </DrawerHeader>
               <DataTable columns={childrenTableColumns} data={records} />
             </div>
@@ -156,13 +171,6 @@ const billTableColumns: Array<ColumnDef<ParentBillData>> = [
         </Drawer>
       )
     },
-  },
-  {
-    accessorKey: 'reference',
-    header: 'Viitenumber',
-    cell: ({ row }) => (
-      <span className="font-mono">{row.original.reference ?? '–'}</span>
-    ),
   },
   {
     id: 'bills',
@@ -193,6 +201,18 @@ const billTableColumns: Array<ColumnDef<ParentBillData>> = [
       return (
         <span className="font-mono whitespace-nowrap">
           {formatCents(paidCents)} / {formatCents(totalCents)}
+        </span>
+      )
+    },
+  },
+  {
+    id: 'paymentsUpdatedAt',
+    header: 'Maksed uuendatud',
+    cell: ({ row }) => {
+      const { paymentsUpdatedAt } = summarizeParent(row.original)
+      return (
+        <span className="text-sm text-muted-foreground whitespace-nowrap">
+          {paymentsUpdatedAt === null ? '–' : formatDateTime(paymentsUpdatedAt)}
         </span>
       )
     },

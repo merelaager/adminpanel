@@ -19,6 +19,7 @@ export type BillStatus = BillSummary['status']
 export const billStatusLabels: Record<BillStatus, string> = {
   paid: 'Makstud',
   open: 'Maksmata',
+  'booking-fee-paid': 'Bronn tasutud',
   'booking-fee-overdue': 'Bronn maksmata',
   'camp-fee-overdue': 'Maksetähtaeg möödas',
   void: 'Tühistatud',

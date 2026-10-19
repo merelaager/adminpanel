@@ -5,6 +5,7 @@ import type { ColumnDef } from '@tanstack/table-core'
 
 import type { PayerAccount } from '@/requests/billing.ts'
 import { payerAccountsQueryOptions } from '@/requests/billing.ts'
+import { formatDateTime } from '@/lib/date.ts'
 import { formatCents } from '@/lib/money.ts'
 import { requireRoot } from '@/lib/roles.ts'
 
@@ -52,12 +53,6 @@ const matchesSearch = (account: PayerAccount, needle: string) => {
     account.email.toLowerCase().includes(needle)
   )
 }
-
-const formatDateTime = (iso: string) =>
-  new Date(iso).toLocaleString('et-EE', {
-    dateStyle: 'short',
-    timeStyle: 'short',
-  })
 
 type PaymentRow = AccountPayment & { totalAfterCents: number }
 

@@ -237,8 +237,8 @@ const registrationColumns: Array<ColumnDef<RegistrationEntry>> = [
   {
     id: 'priceToPay',
     accessorKey: 'priceToPay',
-    header: 'Maksta',
-    meta: { csvHeader: 'Maksta', csvValue: (row) => row.priceToPay },
+    header: 'Hind',
+    meta: { csvHeader: 'Hind', csvValue: (row) => row.priceToPay },
     cell: ({ row, table }) =>
       table.options.meta!.isPriceEditable ? (
         <Input

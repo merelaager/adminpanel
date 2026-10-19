@@ -975,7 +975,7 @@ export interface paths {
                                     paymentsUpdatedAt: string | null;
                                     bills: {
                                         number: number;
-                                        status: "paid" | "open" | "booking-fee-overdue" | "camp-fee-overdue" | "void";
+                                        status: "paid" | "open" | "booking-fee-paid" | "booking-fee-overdue" | "camp-fee-overdue" | "void";
                                         sent: boolean;
                                         paidCents: number;
                                         totalCents: number;
@@ -1381,7 +1381,7 @@ export interface paths {
                                     bill?: {
                                         number: number;
                                         sent: boolean;
-                                        status: "paid" | "open" | "booking-fee-overdue" | "camp-fee-overdue" | "void";
+                                        status: "paid" | "open" | "booking-fee-paid" | "booking-fee-overdue" | "camp-fee-overdue" | "void";
                                         paidCents: number;
                                         totalCents: number;
                                         /** Format: date-time */
@@ -1801,7 +1801,7 @@ export interface paths {
                                         bill: {
                                             number: number;
                                             sent: boolean;
-                                            status: "paid" | "open" | "booking-fee-overdue" | "camp-fee-overdue" | "void";
+                                            status: "paid" | "open" | "booking-fee-paid" | "booking-fee-overdue" | "camp-fee-overdue" | "void";
                                             paidCents: number;
                                             totalCents: number;
                                             /** Format: date-time */
