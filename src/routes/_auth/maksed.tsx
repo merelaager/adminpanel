@@ -59,17 +59,42 @@ const formatDateTime = (iso: string) =>
     timeStyle: 'short',
   })
 
-const paymentColumns: Array<ColumnDef<AccountPayment>> = [
+type PaymentRow = AccountPayment & { totalAfterCents: number }
+
+const withRunningTotals = (payments: Array<AccountPayment>) => {
+  let total = payments.reduce((sum, payment) => sum + payment.amountCents, 0)
+  return payments.map((payment): PaymentRow => {
+    const row = { ...payment, totalAfterCents: total }
+    total -= payment.amountCents
+    return row
+  })
+}
+
+const formatSignedCents = (cents: number) =>
+  `${cents > 0 ? '+' : ''}${formatCents(cents)}`
+
+const paymentColumns: Array<ColumnDef<PaymentRow>> = [
   {
     id: 'createdAt',
-    header: 'Lisatud',
+    header: 'Sisestatud',
     cell: ({ row }) => formatDateTime(row.original.createdAt),
   },
   {
     id: 'amount',
-    header: 'Summa',
+    header: 'Muutus',
     cell: ({ row }) => (
-      <span className="font-mono">{formatCents(row.original.amountCents)}</span>
+      <span className="font-mono whitespace-nowrap">
+        {formatSignedCents(row.original.amountCents)}
+      </span>
+    ),
+  },
+  {
+    id: 'totalAfter',
+    header: 'Makstud',
+    cell: ({ row }) => (
+      <span className="font-mono whitespace-nowrap">
+        {formatCents(row.original.totalAfterCents)}
+      </span>
     ),
   },
 ]
@@ -82,7 +107,9 @@ const PayerCell = ({ account }: { account: PayerAccount }) => (
         className="flex flex-col items-start text-left cursor-pointer hover:underline"
       >
         <span>{account.name}</span>
-        <span className="text-sm text-muted-foreground">{account.email}</span>
+        <span className="text-sm text-muted-foreground font-mono">
+          {account.reference}
+        </span>
       </button>
     </DrawerTrigger>
     <DrawerContent className="mx-auto w-auto">
@@ -90,7 +117,8 @@ const PayerCell = ({ account }: { account: PayerAccount }) => (
         <DrawerHeader>
           <DrawerTitle>{account.name}</DrawerTitle>
           <DrawerDescription>
-            Viitenumber <span className="font-mono">{account.reference}</span>
+            {account.email} · viitenumber{' '}
+            <span className="font-mono">{account.reference}</span>
           </DrawerDescription>
         </DrawerHeader>
         {account.payments.length === 0 ? (
@@ -98,7 +126,7 @@ const PayerCell = ({ account }: { account: PayerAccount }) => (
         ) : (
           <DataTable
             columns={paymentColumns}
-            data={account.payments}
+            data={withRunningTotals(account.payments)}
             getRowId={(payment) => String(payment.id)}
           />
         )}
@@ -126,16 +154,46 @@ const BalanceCell = ({ account }: { account: PayerAccount }) => {
 
 const accountColumns: Array<ColumnDef<PayerAccount>> = [
   {
-    accessorKey: 'reference',
-    header: 'Viitenumber',
-    cell: ({ row }) => (
-      <span className="font-mono">{row.original.reference}</span>
-    ),
-  },
-  {
     id: 'payer',
     header: 'Maksja',
     cell: ({ row }) => <PayerCell account={row.original} />,
+  },
+  {
+    id: 'paid',
+    header: 'Makstud',
+    cell: ({ row }) => (
+      <span className="font-mono whitespace-nowrap">
+        {formatCents(row.original.paidCents)} /{' '}
+        {formatCents(row.original.billedCents)}
+      </span>
+    ),
+  },
+  {
+    id: 'balance',
+    header: 'Jääk',
+    cell: ({ row }) => <BalanceCell account={row.original} />,
+  },
+  {
+    id: 'paymentEntry',
+    header: 'Lisa makse',
+    cell: ({ row }) => (
+      <PaymentEntryInput
+        reference={row.original.reference}
+        payerName={row.original.name}
+      />
+    ),
+  },
+  {
+    id: 'paymentsUpdatedAt',
+    header: 'Viimati uuendatud',
+    cell: ({ row }) => {
+      const updatedAt = row.original.paymentsUpdatedAt
+      return (
+        <span className="text-sm text-muted-foreground whitespace-nowrap">
+          {updatedAt === null ? '–' : formatDateTime(updatedAt)}
+        </span>
+      )
+    },
   },
   {
     id: 'bills',
@@ -151,31 +209,6 @@ const accountColumns: Array<ColumnDef<PayerAccount>> = [
           </div>
         ))}
       </div>
-    ),
-  },
-  {
-    id: 'billed',
-    header: 'Hind',
-    cell: ({ row }) => <Money cents={row.original.billedCents} />,
-  },
-  {
-    id: 'paid',
-    header: 'Makstud',
-    cell: ({ row }) => <Money cents={row.original.paidCents} />,
-  },
-  {
-    id: 'balance',
-    header: 'Jääk',
-    cell: ({ row }) => <BalanceCell account={row.original} />,
-  },
-  {
-    id: 'paymentEntry',
-    header: 'Lisa makse',
-    cell: ({ row }) => (
-      <PaymentEntryInput
-        reference={row.original.reference}
-        payerName={row.original.name}
-      />
     ),
   },
 ]
